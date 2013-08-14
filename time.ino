@@ -25,8 +25,8 @@ inline void split_timestamp(time_t time, struct time_data * data){
 
 inline void update_time(void) {
     time_t current_millis = millis();
-    current_timestamp += (current_millis - previous_millis) / 1000UL;
-    previous_millis = current_millis;
+    while (current_millis > previous_millis)
+        current_timestamp++, previous_millis += 1000;
 
     if (next_sync_threshold <= current_timestamp && time_requester != NULL)
         (*time_requester)(), next_sync_threshold = current_timestamp + sync_interval;
