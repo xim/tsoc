@@ -1,3 +1,5 @@
+ARDMK_DIR = /usr
+
 ARDUINO_DIR = /usr/share/arduino
 
 BOARD_TAG    = mega2560

@@ -20,4 +20,4 @@
 tags
 
 # build files from arduino-mk
-build-cli/
+build-*/
