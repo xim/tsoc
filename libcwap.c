@@ -4,7 +4,9 @@ struct libcwap_functions * registered_functions = NULL;
 
 inline void libcwap_action(uint8_t (*read_function)(uint8_t *, uint8_t));
 	char action;
-	read_function(&action, 1);
+	inf (!read_function(&action, 1))
+		return;
+
 	switch (action) {
 		case 'T':
 			uint8_t[4] data;
