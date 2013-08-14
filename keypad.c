@@ -1,5 +1,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdlib.h>
+
+#include "keypad.h"
 
 void (*action_function)(char) = NULL;
 
@@ -44,6 +47,7 @@ inline void keypad_set_action(void (*function)(char)) {
     action_function = function;
 }
 
-inline void keypad_set_keypad_pressed(char) {
+inline void keypad_set_keypad_pressed(char key) {
+    (void) key;
     keypad_pressed = true;
 }
