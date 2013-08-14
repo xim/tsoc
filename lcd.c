@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "PCD8544.h"
+#include "pcd8544/pcd8544.h"
 
 // TODO use Arduino GPIO, not wiringpi:
 // digitalWrite

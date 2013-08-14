@@ -1,6 +1,6 @@
 #include <stdbool.h>
 
-#include "Time.hpp"
+#include "Time/Time.h"
 
 #include "alarm.h"
 #include "keypad.h"
