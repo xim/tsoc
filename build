@@ -1,0 +1,18 @@
+#!/bin/bash
+
+for file in *.ino *.c ; do
+	mv "$file" "$file"_
+done
+
+cat *.ino_ *.c_ > temp.ino
+
+make "$@"
+retval=$?
+
+rm temp.ino
+
+for file in *.ino_ *.c_ ; do
+	mv "$file" "${file%%_}"
+done
+
+exit $retval
