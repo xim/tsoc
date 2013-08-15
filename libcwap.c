@@ -1,26 +1,29 @@
+#include <stdlib.h>
+
 #include "libcwap.h"
+#include "time.h"
 
 struct libcwap_functions * registered_functions = NULL;
 
-inline void libcwap_action(uint8_t (*read_function)(uint8_t *, uint8_t)) {
+inline void libcwap_action(size_t (*read_function)(char *, size_t)) {
     char action;
     if (!read_function(&action, 1))
         return;
 
+    // Remember to increase the buffer if we want to receive larger packets.
+    char data[4];
     switch (action) {
         case 'T':
-            uint8_t[4] data;
             if (!read_function(data, 4))
                 break;
             if (registered_functions->time_set_function != NULL)
-                registered_functions->time_set_function((time_t) data);
+                registered_functions->time_set_function(*(time_t *) data); // TODO verify these casts
             break;
         case 'O':
-            uint8_t[4] data;
             if (!read_function(data, 4))
                 break;
             if (registered_functions->alarm_set_timestamp != NULL)
-                registered_functions->alarm_set_timestamp((time_t) data);
+                registered_functions->alarm_set_timestamp(*(time_t *) data);
             break;
             // etc.
         default:

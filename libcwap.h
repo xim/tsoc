@@ -1,8 +1,18 @@
+#ifndef LIBCWAP_H
+#define LIBCWAP_H
+
+#include <inttypes.h>
+
+#include "time.h"
+
+#define CWAP_TIME_REQUEST 'T'
+
 struct libcwap_functions {
-    void (*)(time_t) time_set_function;
-    void (*)(time_t) alarm_set_timestamp;
+    void (*time_set_function)(time_t);
+    void (*alarm_set_timestamp)(time_t);
     // etc.
 };
 
-inline void libcwap_action(uint8_t (*)(uint8_t *, uint8_t));
+inline void libcwap_action(size_t (*)(char *, size_t));
 inline void libcwap_register(struct libcwap_functions *);
+#endif

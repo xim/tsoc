@@ -4,7 +4,9 @@
 
 #include "keypad.h"
 
-void (*action_function)(char) = NULL;
+void (*action_function)(char) = keypad_set_keypad_pressed;
+
+bool keypad_has_been_pressed = false;;
 
 static char presses[8];
 static uint8_t head = 0;
@@ -27,20 +29,27 @@ static inline void push_key(char key) {
     presses[tail] = key;
 }
 
-ISR(INT0_vect) {
-    // do interrupt magic =)
-}
+void handle_interrupt(void) {
+    noInterrupts();
+    if (action_function == NULL) {
+        interrupts();
+        return;
+    }
 
-static inline void handle_press(void) {
-    if (action_function != NULL)
+    // TODO actually read keys
+
+    while (head != tail)
         action_function(pop_key());
-    else
-        pop_key();
+    interrupts();
 }
 
 inline void keypad_init(void) {
     // Set up the rows and colums as outputs and inputs
     // Set up interrupts
+    attachInterrupt(0, handle_interrupt, CHANGE); // LOW, CHANGE, RISING, FALLING
+    attachInterrupt(1, handle_interrupt, CHANGE);
+    attachInterrupt(2, handle_interrupt, CHANGE);
+    attachInterrupt(3, handle_interrupt, CHANGE);
 }
 
 inline void keypad_set_action(void (*function)(char)) {
@@ -49,5 +58,9 @@ inline void keypad_set_action(void (*function)(char)) {
 
 inline void keypad_set_keypad_pressed(char key) {
     (void) key;
-    keypad_pressed = true;
+    keypad_has_been_pressed = true;
+}
+
+inline bool keypad_pressed(void) {
+    return keypad_has_been_pressed;
 }
