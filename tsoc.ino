@@ -6,8 +6,8 @@
 #include "menu.h"
 #include "time.h"
 
-#define SERIAL Serial
-#define SERIALEVENT SerialEvent
+#define PI_SERIAL Serial
+#define PI_SERIALEVENT SerialEvent
 
 struct libcwap_functions cwap_functions = {
     set_time,
@@ -23,22 +23,22 @@ inline void wait_for_time_sync(void) {
 }
 
 size_t read_wrapper(char * buf, size_t size) {
-    SERIAL.readBytes(buf, size);
+    return PI_SERIAL.readBytes(buf, size);
 }
 
-void SERIALEVENT() {
+void PI_SERIALEVENT() {
     libcwap_action(read_wrapper);
 }
 
 void request_time(void) {
-    SERIAL.write(CWAP_TIME_REQUEST);
+    PI_SERIAL.write(CWAP_TIME_REQUEST);
 }
 
 void setup(void) {
     menu_init();
     menu_title("Initializing...");
     libcwap_register(&cwap_functions);
-    SERIAL.begin(9600);
+    PI_SERIAL.begin(9600);
     request_time();
     set_time_requester(request_time);
     keypad_init();
