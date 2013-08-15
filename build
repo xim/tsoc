@@ -1,17 +1,17 @@
 #!/bin/bash
 
-for file in *.ino *.c ; do
+for file in *.ino ; do
 	mv "$file" "$file"_
 done
 
-cat *.ino_ *.c_ > temp.ino
+cat *.ino_ > temp.ino
 
 make "$@"
 retval=$?
 
 rm temp.ino
 
-for file in *.ino_ *.c_ ; do
+for file in *.ino_ ; do
 	mv "$file" "${file%%_}"
 done
 
