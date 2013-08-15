@@ -6,7 +6,7 @@
 
 void (*action_function)(char) = keypad_set_keypad_pressed;
 
-bool keypad_has_been_pressed = false;;
+bool keypad_has_been_pressed = false;
 
 static char presses[8];
 static uint8_t head = 0;

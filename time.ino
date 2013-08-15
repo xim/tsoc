@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "time.h"
 
 // "Globally" available time data through getters

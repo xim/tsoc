@@ -1,5 +1,3 @@
-#include <stdbool.h>
-
 #include <SPI.h>
 
 #include "ascii.h"
@@ -8,10 +6,10 @@
 #define set_is_data() digitalWrite(PCD8544_PIN_DC, 1)
 #define set_is_command() digitalWrite(PCD8544_PIN_DC, 0)
 
-uint8_t current_col = 0;
-uint8_t current_line = 0;
+static uint8_t current_col = 0;
+static uint8_t current_line = 0;
 
-inline void inc_col(void) {
+static inline void inc_col(void) {
     if (++current_col >= PCD8544_COLS) {
         current_col = 0;
         if (++current_line >= PCD8544_LINES)
