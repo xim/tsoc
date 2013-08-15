@@ -4,7 +4,7 @@
 
 struct libcwap_functions * registered_functions = NULL;
 
-inline void libcwap_action(size_t (*read_function)(char *, size_t)) {
+void libcwap_action(size_t (*read_function)(char *, size_t)) {
     char action;
     if (!read_function(&action, 1))
         return;
@@ -30,6 +30,6 @@ inline void libcwap_action(size_t (*read_function)(char *, size_t)) {
     }
 }
 
-inline void libcwap_register(struct libcwap_functions * funs) {
+void libcwap_register(struct libcwap_functions * funs) {
     registered_functions = funs;
 }

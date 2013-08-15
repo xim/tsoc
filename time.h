@@ -2,7 +2,6 @@
 #define TIME_H
 
 #include <inttypes.h>
-#include <stdbool.h>
 
 typedef uint32_t time_t;
 
@@ -50,17 +49,17 @@ typedef void (*request_time_function_t)(void);
 #define next_midnight(time) ((time / SECS_PER_DAY + 1) * SECS_PER_DAY)
 //#define next_midnight(time) (time + (SECS_PER_DAY - elapsed_seconds_today(time)))
 
-inline time_t get_current_timestamp(void);
-inline bool time_is_set(void);
-inline time_t get_measured_time_drift(void);
+time_t get_current_timestamp(void);
+bool time_is_set(void);
+time_t get_measured_time_drift(void);
 
-inline time_t get_time(void);
-inline void update_time(void);
-inline void set_time(time_t t);
+time_t get_time(void);
+void update_time(void);
+void set_time(time_t t);
 
-inline void set_time_requester(request_time_function_t);
-inline void set_sync_interval(time_t);
+void set_time_requester(request_time_function_t);
+void set_sync_interval(time_t);
 
-inline void split_timestamp(time_t, struct time_data *);
+void split_timestamp(time_t, struct time_data *);
 
 #endif

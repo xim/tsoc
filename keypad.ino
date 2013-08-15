@@ -43,7 +43,7 @@ void handle_interrupt(void) {
     interrupts();
 }
 
-inline void keypad_init(void) {
+void keypad_init(void) {
     // Set up the rows and colums as outputs and inputs
     // Set up interrupts
     attachInterrupt(0, handle_interrupt, CHANGE); // LOW, CHANGE, RISING, FALLING
@@ -52,15 +52,15 @@ inline void keypad_init(void) {
     attachInterrupt(3, handle_interrupt, CHANGE);
 }
 
-inline void keypad_set_action(void (*function)(char)) {
+void keypad_set_action(void (*function)(char)) {
     action_function = function;
 }
 
-inline void keypad_set_keypad_pressed(char key) {
+void keypad_set_keypad_pressed(char key) {
     (void) key;
     keypad_has_been_pressed = true;
 }
 
-inline bool keypad_pressed(void) {
+bool keypad_pressed(void) {
     return keypad_has_been_pressed;
 }

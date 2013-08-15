@@ -17,7 +17,7 @@ static inline void inc_col(void) {
     }
 }
 
-inline void pcd8544_init(void) {
+void pcd8544_init(void) {
     pinMode(PCD8544_PIN_BL, OUTPUT);
     pinMode(PCD8544_PIN_DC, OUTPUT);
     pinMode(PCD8544_PIN_RST, OUTPUT);
@@ -39,7 +39,7 @@ inline void pcd8544_init(void) {
     set_is_data();
 }
 
-inline void pcd8544_place_cursor(uint8_t column, uint8_t line) {
+void pcd8544_place_cursor(uint8_t column, uint8_t line) {
     if (line >= PCD8544_LINES)
         line %= PCD8544_LINES;
     if (column >= PCD8544_COLS)
@@ -54,7 +54,7 @@ inline void pcd8544_place_cursor(uint8_t column, uint8_t line) {
     set_is_data();
 }
 
-inline void pcd8544_write_char(char value) {
+void pcd8544_write_char(char value) {
     if (value == '\n' || value == '\0') {
         // TODO this may not handle all cases, e.g. when a '\0' is the 15th
         // char of a line...
@@ -68,7 +68,7 @@ inline void pcd8544_write_char(char value) {
     inc_col();
 }
 
-inline void pcd8544_write_string(const char * data) {
+void pcd8544_write_string(const char * data) {
     while (*data == '\n')
         pcd8544_newline(), data++;
 
@@ -77,12 +77,12 @@ inline void pcd8544_write_string(const char * data) {
     while (*data++ != '\0');
 }
 
-inline void pcd8544_clear(void) {
+void pcd8544_clear(void) {
     for (uint8_t i = 0; i != (PCD8544_WIDTH * PCD8544_LINES); i++)
         SPI.transfer(0x00);
 }
 
-inline void pcd8544_newline(void) {
+void pcd8544_newline(void) {
     while (current_col != 0) {
         for (uint8_t i = 0; i != 6; i++)
             SPI.transfer(0x00);
@@ -90,6 +90,6 @@ inline void pcd8544_newline(void) {
     }
 }
 
-inline void pcd8544_set_backlight_state(bool value) {
+void pcd8544_set_backlight_state(bool value) {
     digitalWrite(PCD8544_PIN_BL, value);
 }

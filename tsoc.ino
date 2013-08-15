@@ -1,5 +1,3 @@
-#include <stdbool.h>
-
 #include "alarm.h"
 #include "keypad.h"
 #include "libcwap.h"

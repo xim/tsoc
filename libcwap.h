@@ -2,8 +2,9 @@
 #define LIBCWAP_H
 
 #include <stddef.h>
+#include <inttypes.h>
 
-typedef unsigned long time_t;
+typedef uint32_t time_t;
 
 #define CWAP_TIME_REQUEST 'T'
 
@@ -13,6 +14,6 @@ struct libcwap_functions {
     // etc.
 };
 
-inline void libcwap_action(size_t (*)(char *, size_t));
-inline void libcwap_register(struct libcwap_functions *);
+void libcwap_action(size_t (*)(char *, size_t));
+void libcwap_register(struct libcwap_functions *);
 #endif
