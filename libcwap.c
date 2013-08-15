@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include "libcwap.h"
-#include "time.h"
 
 struct libcwap_functions * registered_functions = NULL;
 

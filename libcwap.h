@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "time.h"
+typedef unsigned long time_t;
 
 #define CWAP_TIME_REQUEST 'T'
 
