@@ -4,25 +4,30 @@
 
 struct libcwap_functions * registered_functions = NULL;
 
+typedef union {
+    char chars[4];
+    uint32_t uinteger;
+    int32_t integer;
+} data32_t;
+
 void libcwap_action(size_t (*read_function)(char *, size_t)) {
     char action;
     if (!read_function(&action, 1))
         return;
 
-    // Remember to increase the buffer if we want to receive larger packets.
-    char data[4];
+    data32_t data32;
     switch (action) {
         case 'T':
-            if (!read_function(data, 4))
+            if (!read_function(data32.chars, 4))
                 break;
             if (registered_functions->time_set_function != NULL)
-                registered_functions->time_set_function(*(time_t *) data); // TODO verify these casts
+                registered_functions->time_set_function(data32.uinteger); // TODO verify these casts
             break;
         case 'O':
-            if (!read_function(data, 4))
+            if (!read_function(data32.chars, 4))
                 break;
             if (registered_functions->alarm_set_timestamp != NULL)
-                registered_functions->alarm_set_timestamp(*(time_t *) data);
+                registered_functions->alarm_set_timestamp(data32.uinteger);
             break;
             // etc.
         default:
