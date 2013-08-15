@@ -10,6 +10,6 @@ ARDUINO_LIBS = SPI
 .PHONY: intercept
 
 intercept:
-	@./build all
+	./build all
 
 include /usr/share/arduino/Arduino.mk

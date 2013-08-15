@@ -6,7 +6,11 @@ done
 
 cat *.ino_ > temp.ino
 
-make "$@"
+if [[ $# -eq 0 ]] ;then
+	make run
+else
+	make "$@"
+fi
 retval=$?
 
 rm temp.ino
