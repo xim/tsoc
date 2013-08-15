@@ -70,7 +70,7 @@ inline void pcd8544_write_char(char value) {
     inc_col();
 }
 
-inline void pcd8544_write_string(char * data) {
+inline void pcd8544_write_string(const char * data) {
     while (*data == '\n')
         pcd8544_newline(), data++;
 

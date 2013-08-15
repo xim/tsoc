@@ -1,7 +1,7 @@
 #ifndef LIBCWAP_H
 #define LIBCWAP_H
 
-#include <inttypes.h>
+#include <stddef.h>
 
 #include "time.h"
 

@@ -21,12 +21,12 @@ inline void menu_action(char button) {
     menu_content(data);
 }
 
-inline void menu_title(char * title) {
+inline void menu_title(const char * title) {
     pcd8544_place_cursor(0, 0);
     pcd8544_write_string(title);
 }
 
-inline void menu_content(char * content) {
+inline void menu_content(const char * content) {
     pcd8544_place_cursor(3, 3);
     pcd8544_write_string(content);
 }
