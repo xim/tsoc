@@ -19,6 +19,6 @@ struct libcwap_functions {
     // etc.
 };
 
-void libcwap_action(size_t (*)(char *, size_t));
+void libcwap_action(read_function_t);
 void libcwap_register(struct libcwap_functions *);
 #endif
