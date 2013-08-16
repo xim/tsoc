@@ -8,6 +8,7 @@
 #define PI_SERIALEVENT SerialEvent
 
 struct libcwap_functions cwap_functions = {
+    NULL,
     set_time,
     alarm_set_timestamp,
     // etc.

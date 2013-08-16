@@ -6,12 +6,16 @@
 
 typedef uint32_t time_t;
 
+typedef size_t (*read_function_t)(char *, size_t);
+
 #define CWAP_TIME_REQUEST '\t'
+#define CWAP_TIME_SET 'T'
 #define CWAP_SET_ALARM_TIMESTAMP 'O'
 
 struct libcwap_functions {
+    void (*time_request_function)(void);
     void (*time_set_function)(time_t);
-    void (*alarm_set_timestamp)(time_t);
+    void (*alarm_set_timestamp)(uint8_t, time_t);
     // etc.
 };
 

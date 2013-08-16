@@ -4,30 +4,49 @@
 
 struct libcwap_functions * registered_functions = NULL;
 
-typedef union {
-    char chars[4];
-    uint32_t uinteger;
-    int32_t integer;
-} data32_t;
+static void handle_time_data_request() {
+    if (registered_functions->time_request_function != NULL)
+        registered_functions->time_request_function();
+}
 
-void libcwap_action(size_t (*read_function)(char *, size_t)) {
+static void handle_time_set_request(read_function_t read_function) {
+    union {
+        char chars[4];
+        uint32_t timestamp;
+    } data;
+    if (!read_function(data.chars, 4) || registered_functions->time_set_function == NULL)
+        return;
+    registered_functions->time_set_function(data.timestamp);
+}
+
+static void handle_alarm_set_timestamp_request(read_function_t read_function) {
+    union {
+        char chars[5];
+        struct {
+            uint8_t alarmno;
+            uint32_t timestamp;
+        } alarm;
+    } data;
+    _Static_assert(sizeof data.chars == sizeof data.alarm, "Alignment padding of data detected");
+    if (!read_function(data.chars, 5) || registered_functions->alarm_set_timestamp == NULL)
+        return;
+    registered_functions->alarm_set_timestamp(data.alarm.alarmno, data.alarm.timestamp);
+}
+
+void libcwap_action(read_function_t read_function) {
     char action;
     if (!read_function(&action, 1))
         return;
 
-    data32_t data32;
     switch (action) {
         case CWAP_TIME_REQUEST:
-            if (!read_function(data32.chars, 4))
-                break;
-            if (registered_functions->time_set_function != NULL)
-                registered_functions->time_set_function(data32.uinteger); // TODO verify these casts
+            handle_time_data_request();
+            break;
+        case CWAP_TIME_SET:
+            handle_time_set_request(read_function);
             break;
         case CWAP_SET_ALARM_TIMESTAMP:
-            if (!read_function(data32.chars, 4))
-                break;
-            if (registered_functions->alarm_set_timestamp != NULL)
-                registered_functions->alarm_set_timestamp(data32.uinteger);
+            handle_alarm_set_timestamp_request(read_function);
             break;
             // etc.
         default:
