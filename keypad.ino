@@ -20,6 +20,8 @@ char buttons[KEYPAD_NUM_ROWS_COLS][KEYPAD_NUM_ROWS_COLS] = {
     {'*', '0', '#', 'D'}
 };
 
+uint16_t buttons_held = 0;
+
 static inline char dequeue_key(void) {
     if (head == tail)
         return '\0';
@@ -37,6 +39,8 @@ static inline void queue_key(char key) {
     presses[tail] = key;
 }
 
+#define has_press(row) (!digitalRead(KEYPAD_ROW_PIN_BASE + row))
+#define was_pressed(bitmask) (buttons_held & bitmask)
 void handle_interrupt(void) {
     noInterrupts();
     if (action_function == NULL) {
@@ -49,10 +53,12 @@ void handle_interrupt(void) {
 
     for (uint8_t i = 0; i != KEYPAD_NUM_ROWS_COLS ; i++) {
         digitalWrite(KEYPAD_COL_PIN_BASE + i, LOW);
-        for (uint8_t j = 0; j != KEYPAD_NUM_ROWS_COLS ; j++)
-            if (!digitalRead(KEYPAD_ROW_PIN_BASE + j))
-                // TODO Handle multibutton presses
+        for (uint8_t j = 0; j != KEYPAD_NUM_ROWS_COLS ; j++) {
+            uint16_t bitmask = (1 << (i * 4 + j));
+            if (has_press(j) && !was_pressed(bitmask))
                 queue_key(buttons[i][j]);
+            buttons_held ^= bitmask;
+        }
         digitalWrite(KEYPAD_COL_PIN_BASE + i, HIGH);
     }
 
@@ -61,7 +67,7 @@ void handle_interrupt(void) {
     interrupts();
 
     char keypress;
-    while (head != tail && (keypress = dequeue_key()) != '\0')
+    while ((keypress = dequeue_key()) != '\0')
         action_function(keypress);
 }
 
@@ -69,10 +75,8 @@ void keypad_init(void) {
     for (uint8_t i = 0; i != KEYPAD_NUM_ROWS_COLS ; i++) {
         pinMode(KEYPAD_COL_PIN_BASE + i, OUTPUT);
         digitalWrite(KEYPAD_COL_PIN_BASE + i, LOW);
-        // TODO unsure if INPUT_PULLUP is digital high with high impedance, needs testing.
         pinMode(KEYPAD_ROW_PIN_BASE + i, INPUT_PULLUP);
-        // TODO set to CHANGED and handle multiple buttons!
-        attachInterrupt(INTERRUPT_BASE + i, handle_interrupt, FALLING);
+        attachInterrupt(INTERRUPT_BASE + i, handle_interrupt, CHANGE);
     }
 }
 
