@@ -1,17 +1,7 @@
-ARDMK_DIR = /usr
+.phony: $(MAKECMDGOALS) default_target
 
-ARDUINO_DIR = /usr/share/arduino
+$(MAKECMDGOALS):
+	./build $(MAKECMDGOALS)
 
-AVR_TOOLS_DIR = /usr
-
-BOARD_TAG    = mega2560
-ARDUINO_PORT = /dev/ttyUSB1
-
-ARDUINO_LIBS = SPI
-
-.PHONY: intercept
-
-intercept:
+default_target:
 	./build all
-
-include /usr/share/arduino/Arduino.mk

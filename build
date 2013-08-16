@@ -7,9 +7,9 @@ done
 cat *.ino_ > temp.ino
 
 if [[ $# -eq 0 ]] ;then
-	make all
+	make -fMakefile_ all
 else
-	make "$@"
+	make -fMakefile_ "$@"
 fi
 retval=$?
 
