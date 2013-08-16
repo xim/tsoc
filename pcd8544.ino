@@ -78,7 +78,7 @@ void pcd8544_write_string(const char * data) {
 }
 
 void pcd8544_clear(void) {
-    for (uint8_t i = 0; i != (PCD8544_WIDTH * PCD8544_LINES); i++)
+    for (uint16_t i = 0; i != (PCD8544_WIDTH * PCD8544_LINES); i++)
         SPI.transfer(0x00);
 }
 
