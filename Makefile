@@ -3,7 +3,7 @@
 $(MAKECMDGOALS):
 	./build $(MAKECMDGOALS)
 
-all: build-cli/temp.cpp
+all: build-*/tsoc.hex
 
-build-cli/temp.cpp: *.ino *.c *.h build Make*
+build-*/tsoc.hex: *.ino *.c *.h build Make*
 	./build all
