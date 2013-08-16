@@ -1,10 +1,12 @@
 #!/bin/bash
 
+[[ -f temp.ino ]] && rm temp.ino
+
 for file in *.ino *.c ; do
+	echo "#line 1 \"$file\"" >> temp.ino
+	cat "$file" >> temp.ino
 	mv "$file" "$file"_
 done
-
-cat *.ino_ > temp.ino
 
 if [[ $# -eq 0 ]] ;then
 	make -fMakefile_ all
