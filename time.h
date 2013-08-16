@@ -41,13 +41,8 @@ typedef void (*request_time_function_t)(void);
 
 // Calculation macros
 #define elapsed_seconds_today(time) (time % SECS_PER_DAY)
-// Which is better?
-#define last_midnight(time) ((time / SECS_PER_DAY) * SECS_PER_DAY)
-//#define last_midnight(time) (time - elapsed_seconds_today(time))
-// And here, too... ?
-//#define next_midnight(time) (last_midnight(time) + SECS_PER_DAY)
-#define next_midnight(time) ((time / SECS_PER_DAY + 1) * SECS_PER_DAY)
-//#define next_midnight(time) (time + (SECS_PER_DAY - elapsed_seconds_today(time)))
+#define last_midnight(time) (time - elapsed_seconds_today(time))
+#define next_midnight(time) (last_midnight(time) + SECS_PER_DAY)
 
 time_t get_current_timestamp(void);
 bool time_is_set(void);
