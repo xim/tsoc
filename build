@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for file in *.ino ; do
+for file in *.ino *.c ; do
 	mv "$file" "$file"_
 done
 
@@ -15,7 +15,7 @@ retval=$?
 
 rm temp.ino
 
-for file in *.ino_ ; do
+for file in *.ino_ *.c_ ; do
 	mv "$file" "${file%%_}"
 done
 
