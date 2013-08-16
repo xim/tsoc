@@ -8,7 +8,8 @@ void (*action_function)(char) = keypad_set_keypad_pressed;
 
 bool keypad_has_been_pressed = false;
 
-static char presses[8];
+#define FIFO_SIZE 8
+static char presses[FIFO_SIZE];
 static uint8_t head = 0;
 static uint8_t tail = 0;
 
@@ -17,15 +18,15 @@ static inline char pop_key(void) {
         return '\0';
     char key = presses[head];
     head++;
-    head %= 8;
+    head %= FIFO_SIZE;
     return key;
 }
 
 static inline void push_key(char key) {
-    if ((tail + 1) % 8 == head)
+    uint8_t next_tail = (tail + 1) % FIFO_SIZE;
+    if (next_tail == head)
         return;
-    tail++;
-    tail %= 8;
+    tail = next_tail;
     presses[tail] = key;
 }
 
