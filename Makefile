@@ -1,7 +1,9 @@
-.phony: $(MAKECMDGOALS) default_target
+.phony: $(MAKECMDGOALS) all
 
 $(MAKECMDGOALS):
 	./build $(MAKECMDGOALS)
 
-default_target:
+all: build-cli/temp.cpp
+
+build-cli/temp.cpp: *.ino *.c *.h build Make*
 	./build all
