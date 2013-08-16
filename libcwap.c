@@ -27,7 +27,7 @@ static void handle_alarm_set_timestamp_request(read_function_t read_function) {
             uint32_t timestamp;
         } alarm;
     } data;
-    _Static_assert(sizeof data.chars == sizeof data.alarm, "Alignment padding of data detected");
+    //_Static_assert(sizeof data.chars == sizeof data.alarm, "Alignment padding of data detected");
     if (!read_function(data.chars, 5) || registered_functions->alarm_set_timestamp == NULL)
         return;
     registered_functions->alarm_set_timestamp(data.alarm.alarmno, data.alarm.timestamp);
