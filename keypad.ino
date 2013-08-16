@@ -55,9 +55,13 @@ void handle_interrupt(void) {
         digitalWrite(KEYPAD_COL_PIN_BASE + i, LOW);
         for (uint8_t j = 0; j != KEYPAD_NUM_ROWS_COLS ; j++) {
             uint16_t bitmask = (1 << (i * 4 + j));
-            if (has_press(j) && !was_pressed(bitmask))
-                queue_key(buttons[i][j]);
-            buttons_held ^= bitmask;
+            if (has_press(j)) {
+                if (!was_pressed(bitmask)) {
+                    buttons_held |= bitmask;
+                    queue_key(buttons[i][j]);
+                }
+            } else if (was_pressed(bitmask))
+                buttons_held &= (bitmask ^ 0xFF);
         }
         digitalWrite(KEYPAD_COL_PIN_BASE + i, HIGH);
     }
