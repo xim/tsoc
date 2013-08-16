@@ -6,7 +6,8 @@
 
 typedef uint32_t time_t;
 
-#define CWAP_TIME_REQUEST 'T'
+#define CWAP_TIME_REQUEST '\t'
+#define CWAP_SET_ALARM_TIMESTAMP 'O'
 
 struct libcwap_functions {
     void (*time_set_function)(time_t);

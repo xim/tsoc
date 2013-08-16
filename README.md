@@ -17,11 +17,11 @@ succeeds, the device is in normal operation, and requests an alarm sync.
 
 Possible messages from the Arduino:
 
-    T  – Request a time update
+    \t – Request a time update
     \v – Request that the time be spoken
     \n – Make a really annoying sound at random
     \a – request that all alarm data be resent
-    (Also, remaining messages except T apply here)
+    (Also, remaining messages apply here)
 
 Possible messages from the Pi:
 

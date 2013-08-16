@@ -17,13 +17,13 @@ void libcwap_action(size_t (*read_function)(char *, size_t)) {
 
     data32_t data32;
     switch (action) {
-        case 'T':
+        case CWAP_TIME_REQUEST:
             if (!read_function(data32.chars, 4))
                 break;
             if (registered_functions->time_set_function != NULL)
                 registered_functions->time_set_function(data32.uinteger); // TODO verify these casts
             break;
-        case 'O':
+        case CWAP_SET_ALARM_TIMESTAMP:
             if (!read_function(data32.chars, 4))
                 break;
             if (registered_functions->alarm_set_timestamp != NULL)
