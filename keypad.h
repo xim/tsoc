@@ -1,6 +1,13 @@
 #ifndef KEYPAD_H
 #define KEYPAD_H
 
+#define KEYPAD_COL_PIN_BASE 14
+#define KEYPAD_ROW_PIN_BASE 18
+
+#define KEYPAD_NUM_ROWS_COLS 4
+
+#define INTERRUPT_BASE 2
+
 // Most basic functionality – detect if a key has been pressed.
 // Set by keypad_set_keypad_pressed
 bool keypad_pressed(void);
