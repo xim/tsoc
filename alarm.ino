@@ -1,5 +1,6 @@
 #include "alarm.h"
 #include "menu.h"
+#include "time.h"
 
 static time_t the_only_alarm_supported = -1;
 
@@ -11,6 +12,9 @@ void alarm_set_timestamp(uint8_t alarmno, time_t timestamp) {
 void alarm_run_if_appropriate(time_t timestamp) {
     if (the_only_alarm_supported < timestamp) {
         the_only_alarm_supported = -1;
-        menu_content("Alarm, alarm!");
+
+        struct time_data time_elements;
+        split_timestamp(timestamp, &time_elements);
+        menu_draw_big_clock(&time_elements);
     }
 }

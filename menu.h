@@ -10,4 +10,5 @@ void menu_redraw_clock(struct time_data *);
 void menu_action(char);
 void menu_title(const char * title);
 void menu_content(const char * content);
+void menu_draw_big_clock(struct time_data *);
 #endif

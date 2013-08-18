@@ -67,6 +67,7 @@ void pcd8544_clear(void);
 void pcd8544_place_cursor(uint8_t column, uint8_t row);
 void pcd8544_write_char(char);
 void pcd8544_write_string(const char *);
+void pcd8544_draw_big_clock(const char *);
 void pcd8544_newline();
 void pcd8544_set_backlight_state(bool);
 #endif

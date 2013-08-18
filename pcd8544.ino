@@ -1,6 +1,7 @@
 #include <SPI.h>
 
 #include "ascii.h"
+#include "big_numbers.h"
 #include "pcd8544.h"
 
 #define set_is_data() digitalWrite(PCD8544_PIN_DC, 1)
@@ -54,6 +55,11 @@ void pcd8544_place_cursor(uint8_t column, uint8_t line) {
     set_is_data();
 }
 
+static inline void write_bytes(const uint8_t * data, size_t count) {
+    for (size_t i = 0 ; i != count ; i++)
+        SPI.transfer(*(data + i));
+}
+
 void pcd8544_write_char(char value) {
     if (value == '\n' || value == '\0') {
         // TODO this may not handle all cases, e.g. when a '\0' is the 15th
@@ -62,10 +68,22 @@ void pcd8544_write_char(char value) {
         return;
     }
     const uint8_t * data = ASCII[value - ' '];
-    for (int i = 0 ; i != 5 ; i++)
-        SPI.transfer(data[i]);
+    write_bytes(data, 5);
     SPI.transfer(0x00); // 8 blank bits to separate chars
     inc_col();
+}
+
+void pcd8544_draw_big_clock(const char * clock) {
+    for (uint32_t line = 0 ; line != 3 ; line++) {
+        pcd8544_place_cursor(6, line + 1);
+        for (uint32_t i = 0; i != 5 ; i++) {
+            if ((*(clock + i)) == ':')
+                write_bytes(colon_24x8[line], 8);
+            else
+                // The font data, index 24 * numerical value of the char
+                write_bytes(numbers_24x16[line] + (24 * ((*(clock + i)) - '0')), 24);
+        }
+    }
 }
 
 void pcd8544_write_string(const char * data) {

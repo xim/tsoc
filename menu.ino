@@ -11,8 +11,14 @@ void menu_init(void) {
 void menu_redraw_clock(struct time_data * time) {
     pcd8544_place_cursor(9, 6);
     char clock[6];
-    snprintf(clock, 6, "%d:%d", time->hour, time->minute);
+    snprintf(clock, 6, "%02d:%02d", time->hour, time->minute);
     pcd8544_write_string(clock);
+}
+
+void menu_draw_big_clock(struct time_data * time) {
+    char clock[6];
+    snprintf(clock, 6, "%02d:%02d", time->hour, time->minute);
+    pcd8544_draw_big_clock(clock);
 }
 
 void menu_action(char button) {
