@@ -26,17 +26,13 @@ def convert_file(filename):
         return
 
     with open(name + '.h', 'w') as out:
-        out.write("uint8_t %s_%dx%d[%d][%d] = {\n" % (name, width, height, height / 8, width))
+        out.write("uint8_t %s_%dx%d[%d][%d] = {\n" % (name, height, width, height / 8, width))
         for line in xrange(0, height, 8):
             out.write("{")
             for col in xrange(width):
                 out.write('0x%02x' % int(''.join(data[line + row][col] for row in xrange(7, -1, -1)), 2))
-                if col + 1 != width:
-                    out.write(', ')
-            if line + 8 != height:
-                out.write("},\n")
-            else:
-                out.write("}\n")
+                out.write(', ')
+            out.write("},\n")
         out.write("};\n")
     sys.stdout.write(" DONE\n")
 
