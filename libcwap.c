@@ -4,35 +4,31 @@
 
 struct libcwap_functions * registered_functions = NULL;
 
-static void handle_time_data_request() {
-    if (registered_functions->time_request_function != NULL)
-        registered_functions->time_request_function();
-}
+#define HANDLE_VOID(CALLBACK) { \
+    if (registered_functions->CALLBACK == NULL) \
+        return; \
+    registered_functions->CALLBACK(); \
+} break;
 
-static void handle_time_set_request(read_function_t read_function) {
-    union {
-        char chars[4];
-        uint32_t timestamp;
-    } data;
-    if (!read_function(data.chars, 4) || registered_functions->time_set_function == NULL)
-        return;
-    registered_functions->time_set_function(data.timestamp);
-}
+#define HANDLE_SIMPLE(CALLBACK, DTYPE) { \
+    union { \
+        char chars[sizeof(DTYPE)]; \
+        DTYPE content; \
+    } data; \
+    if (!read_function(data.chars, sizeof(DTYPE)) || registered_functions->CALLBACK == NULL) \
+        return; \
+    registered_functions->CALLBACK(data.content); \
+} break;
 
-static void handle_alarm_set_timestamp_request(read_function_t read_function) {
-    union {
-        char chars[5];
-        struct PACKED {
-            uint8_t alarmno;
-            uint32_t timestamp;
-        } alarm;
-    } data;
-    // Uncomment when testing alignment on new platforms/compilers.
-    //_Static_assert(sizeof data.chars == sizeof data.alarm, "Alignment padding of data detected");
-    if (!read_function(data.chars, 5) || registered_functions->alarm_set_timestamp == NULL)
-        return;
-    registered_functions->alarm_set_timestamp(data.alarm.alarmno, data.alarm.timestamp);
-}
+#define HANDLE(CALLBACK, DTYPE) { \
+    union { \
+        char chars[sizeof(DTYPE)]; \
+        DTYPE content; \
+    } data; \
+    if (!read_function(data.chars, sizeof(DTYPE)) || registered_functions->CALLBACK == NULL) \
+        return; \
+    registered_functions->CALLBACK(&data.content); \
+} break;
 
 void libcwap_action(read_function_t read_function) {
     char action;
@@ -40,16 +36,19 @@ void libcwap_action(read_function_t read_function) {
         return;
 
     switch (action) {
-        case CWAP_TIME_REQUEST:
-            handle_time_data_request();
-            break;
-        case CWAP_TIME_SET:
-            handle_time_set_request(read_function);
-            break;
-        case CWAP_SET_ALARM_TIMESTAMP:
-            handle_alarm_set_timestamp_request(read_function);
-            break;
-            // etc.
+        case CWAP_REQUEST_TIME: HANDLE_VOID(time_request_function);
+        case CWAP_REQUEST_SPEAKING_CLOCK: HANDLE_SIMPLE(speaking_clock_request_function, time_t);
+        case CWAP_REQUEST_NOISE: HANDLE_VOID(noise_request_function);
+        case CWAP_REQUEST_ALL_ALARMS: HANDLE_VOID(alarms_request_function);
+
+        case CWAP_SET_TIME: HANDLE_SIMPLE(time_set_function, time_t);
+        case CWAP_SET_ACTIONSPEC: HANDLE(action_spec_set, action_spec_set_t);
+        case CWAP_SET_ALARM_ACTIONS: HANDLE(alarm_action_set, alarm_action_set_t);
+        case CWAP_SET_ALARM_TIMESTAMP: HANDLE(alarm_time_set, alarm_time_set_t);
+        case CWAP_SET_ALARM_NAME: HANDLE(alarm_name_set, alarm_name_set_t);
+        case CWAP_SET_ALARM_REPEAT: HANDLE(alarm_repeat_set, alarm_repeat_set_t);
+        case CWAP_DELETE_ALARM: HANDLE_SIMPLE(alarm_delete, uint8_t);
+
         default:
             ; // Assume the data was garbage.
     }

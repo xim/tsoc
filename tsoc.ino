@@ -8,10 +8,18 @@
 #define PI_SERIALEVENT SerialEvent
 
 struct libcwap_functions cwap_functions = {
-    NULL,
-    set_time,
-    alarm_set_timestamp,
-    // etc.
+    .time_request_function = NULL,
+    .speaking_clock_request_function = NULL,
+    .noise_request_function = NULL,
+    .alarms_request_function = NULL,
+
+    .time_set_function = set_time,
+    .action_spec_set = NULL,
+    .alarm_action_set = NULL,
+    .alarm_time_set = alarm_set_timestamp,
+    .alarm_name_set = NULL,
+    .alarm_repeat_set = NULL,
+    .alarm_delete = NULL,
 };
 
 inline void wait_for_time_sync(void) {
@@ -30,7 +38,7 @@ void PI_SERIALEVENT() {
 }
 
 void request_time(void) {
-    PI_SERIAL.write(CWAP_TIME_REQUEST);
+    PI_SERIAL.write(CWAP_REQUEST_TIME);
 }
 
 void setup(void) {
