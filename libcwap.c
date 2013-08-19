@@ -15,7 +15,7 @@ struct libcwap_functions * registered_functions = NULL;
         char chars[sizeof(DTYPE)]; \
         DTYPE content; \
     } data; \
-    if (!read_function(data.chars, sizeof(DTYPE)) || registered_functions->CALLBACK == NULL) \
+    if (read_function(data.chars, sizeof(DTYPE)) != sizeof(DTYPE) || registered_functions->CALLBACK == NULL) \
         return; \
     registered_functions->CALLBACK(data.content); \
 } break;
@@ -25,7 +25,7 @@ struct libcwap_functions * registered_functions = NULL;
         char chars[sizeof(DTYPE)]; \
         DTYPE content; \
     } data; \
-    if (!read_function(data.chars, sizeof(DTYPE)) || registered_functions->CALLBACK == NULL) \
+    if (read_function(data.chars, sizeof(DTYPE)) != sizeof(DTYPE) || registered_functions->CALLBACK == NULL) \
         return; \
     registered_functions->CALLBACK(&data.content); \
 } break;
