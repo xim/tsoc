@@ -1,4 +1,4 @@
-.phony: $(MAKECMDGOALS) all
+.PHONY: $(MAKECMDGOALS) all
 
 $(MAKECMDGOALS):
 	./build $(MAKECMDGOALS)
