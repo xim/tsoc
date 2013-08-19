@@ -8,6 +8,10 @@ typedef uint32_t time_t;
 
 typedef size_t (*read_function_t)(char *, size_t);
 
+#ifndef PACKED
+#define PACKED __attribute__((__packed__))
+#endif
+
 #define CWAP_TIME_REQUEST '\t'
 #define CWAP_TIME_SET 'T'
 #define CWAP_SET_ALARM_TIMESTAMP 'O'

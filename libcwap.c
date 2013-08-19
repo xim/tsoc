@@ -22,11 +22,12 @@ static void handle_time_set_request(read_function_t read_function) {
 static void handle_alarm_set_timestamp_request(read_function_t read_function) {
     union {
         char chars[5];
-        struct {
+        struct PACKED {
             uint8_t alarmno;
             uint32_t timestamp;
         } alarm;
     } data;
+    // Uncomment when testing alignment on new platforms/compilers.
     //_Static_assert(sizeof data.chars == sizeof data.alarm, "Alignment padding of data detected");
     if (!read_function(data.chars, 5) || registered_functions->alarm_set_timestamp == NULL)
         return;
