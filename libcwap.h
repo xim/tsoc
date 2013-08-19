@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <inttypes.h>
 
-typedef uint32_t time_t;
+typedef uint32_t timestamp_t;
 
 typedef size_t (*read_function_t)(char *, size_t);
 
@@ -64,16 +64,16 @@ typedef struct PACKED {
 
 typedef struct PACKED {
     uint8_t alarmno;
-    time_t timestamp;
+    timestamp_t timestamp;
 } alarm_time_set_t;
 
 struct libcwap_functions {
     void (*time_request_function)(void);
-    void (*speaking_clock_request_function)(time_t);
+    void (*speaking_clock_request_function)(timestamp_t);
     void (*noise_request_function)(void);
     void (*alarms_request_function)(void);
 
-    void (*time_set_function)(time_t);
+    void (*time_set_function)(timestamp_t);
     void (*action_spec_set)(action_spec_set_t *);
     void (*alarm_action_set)(alarm_action_set_t *);
     void (*alarm_time_set)(alarm_time_set_t *);

@@ -37,11 +37,11 @@ void libcwap_action(read_function_t read_function) {
 
     switch (action) {
         case CWAP_REQUEST_TIME: HANDLE_VOID(time_request_function);
-        case CWAP_REQUEST_SPEAKING_CLOCK: HANDLE_SIMPLE(speaking_clock_request_function, time_t);
+        case CWAP_REQUEST_SPEAKING_CLOCK: HANDLE_SIMPLE(speaking_clock_request_function, timestamp_t);
         case CWAP_REQUEST_NOISE: HANDLE_VOID(noise_request_function);
         case CWAP_REQUEST_ALL_ALARMS: HANDLE_VOID(alarms_request_function);
 
-        case CWAP_SET_TIME: HANDLE_SIMPLE(time_set_function, time_t);
+        case CWAP_SET_TIME: HANDLE_SIMPLE(time_set_function, timestamp_t);
         case CWAP_SET_ACTIONSPEC: HANDLE(action_spec_set, action_spec_set_t);
         case CWAP_SET_ALARM_ACTIONS: HANDLE(alarm_action_set, alarm_action_set_t);
         case CWAP_SET_ALARM_TIMESTAMP: HANDLE(alarm_time_set, alarm_time_set_t);
