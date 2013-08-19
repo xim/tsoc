@@ -28,12 +28,12 @@ static size_t action_read_wrapper(char * buf, size_t size) {
     PyObject *arglist;
     int ret_size = 0;
     // Create a tuple to feed back to python
-    arglist = Py_BuildValue("(s,i)", buf, size)
+    arglist = Py_BuildValue("(s,i)", buf, size);
     // Actually call python: Have python grab size bytes from GPIO, I think?
-    result = PyObject_CallObject(serial_reader, arglist)
+    result = PyObject_CallObject(serial_reader, arglist);
     Py_DECREF(arglist);
     if (result == NULL)
-        return NULL; // stuff went tits-up.
+        return 0; // stuff went tits-up.
     if(PyArg_ParseTuple(result, "s", &buf))
         ret_size = size;
     Py_DECREF(result);
