@@ -21,3 +21,7 @@ tags
 
 # build files from arduino-mk
 build-*/
+
+# Python stuff
+*.pyc
+*.egg-info
