@@ -12,6 +12,8 @@ for arg in "$@" ;do
 	fi
 done
 
+[[ $# -eq 1 && "$1" = "cwappy" ]] && exit
+
 [[ -f temp.ino ]] && rm temp.ino
 
 for file in *.ino *.c ; do
