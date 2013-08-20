@@ -2,12 +2,22 @@
 
 import datetime
 import serial
+import threading
 import time
+import subprocess
 
 import libcwap
 
 def str_to_ts(data_str):
     return sum(ord(byte) << ((3 - i) * 8) for i, byte in enumerate(data_str))
+
+class NoiseMaker(threading.Thread):
+    def __init__(self):
+        self.daemon = True
+        super(NoiseMaker, self).__init__()
+
+    def run(self):
+        subprocess.call(('aplay', 'noise.wav'))
 
 class ArduinoListener(object):
 
@@ -71,7 +81,8 @@ class ArduinoListener(object):
 
     def noise_request_function(self):
         self.info('Speaking time using headphone output')
-        # TODO actually make some silly noise. In a thread please!
+        noiser = NoiseMaker()
+        noiser.start()
 
     def alarms_request_function(self):
         self.info('Sending all alarm data over serial')
