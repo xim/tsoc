@@ -1,19 +1,5 @@
 #!/bin/bash
 
-declare -a args
-
-for arg in "$@" ;do
-	if [[ "$arg" = "cwappy" ]] ;then
-		make -C cwappy
-		retval=$?
-		[[ $retval -eq 0 ]] || exit $retval
-	else
-		args+=("$arg")
-	fi
-done
-
-[[ $# -eq 1 && "$1" = "cwappy" ]] && exit
-
 [[ -f temp.ino ]] && rm temp.ino
 
 for file in *.ino *.c ; do
@@ -22,11 +8,7 @@ for file in *.ino *.c ; do
 	mv "$file" "$file"_
 done
 
-if [[ ${#args[@]} -eq 0 ]] ;then
-	make -fMakefile_ all
-else
-	make -fMakefile_ "${args[@]}"
-fi
+make -fMakefile_ "$@"
 retval=$?
 
 rm temp.ino
