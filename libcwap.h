@@ -33,7 +33,23 @@ typedef size_t (*read_function_t)(char *, size_t);
 typedef struct PACKED {
     uint8_t actionno;
     struct PACKED {
-        uint32_t actionmask;
+        union {
+            uint32_t mask;
+            struct PACKED {
+                bool enable_relay_1 : 1;
+                bool disable_relay_1 : 1;
+                bool enable_relay_2 : 1;
+                bool disable_relay_2 : 1;
+                bool enable_relay_3 : 1;
+                bool disable_relay_3 : 1;
+                bool enable_relay_4 : 1;
+                bool disable_relay_4 : 1; // eighth bit
+
+                bool blink_backlight : 1;
+                bool make_noise : 1;
+                bool speaking_clock : 1; // eleventh bit
+            } flags;
+        } actions;
         bool snoozability : 1;
         uint16_t timeout : 15; // uint15_t!
         int16_t offset;
