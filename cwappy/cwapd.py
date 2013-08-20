@@ -69,10 +69,13 @@ class ArduinoListener(object):
 
     def time_request_function(self):
         self.info('Sending timestamp over serial')
-        self.arduino.write('T')
-        ts = int(time.time())
-        for offset in xrange(0, 32, 8):
-            self.arduino.write(ts >> offset & 0xff)
+        try:
+            self.arduino.write('T')
+            ts = int(time.time())
+            for offset in xrange(0, 32, 8):
+                self.arduino.write(ts >> offset & 0xff)
+        except serial.writeTimeoutError:
+            pass
 
     def speaking_clock_request_function(self, timestamp):
         time_data = datetime.datetime.fromtimestamp(timestamp)
@@ -87,7 +90,14 @@ class ArduinoListener(object):
     def alarms_request_function(self):
         self.info('Sending all alarm data over serial')
         for data_str in self.all_data:
-            self.arduino.write(data_str)
+            success = False
+            while not success:
+                try:
+                    self.arduino.write(data_str)
+                except serial.writeTimeoutError:
+                    pass
+                else:
+                    success = True
 
     def record_data(self, data):
         self.info('Recording incoming data "%s"' % data)
