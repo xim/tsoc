@@ -26,8 +26,8 @@ Possible messages from the Arduino:
 Possible messages from the Pi:
 
     T(timestamp) – Set the time
-    P(actionno)(actionspec)* – Set programmable alarm action with action specs
-    A(alarmno)(actionno)* – Set alarm actions for given alarm
+    P(actionno)(actionspec){8} – Set programmable alarm action with action specs
+    A(alarmno)(actionno){8} – Set alarm actions for given alarm
     O(alarmno)(timestamp) – Set alarm to run once at given time stamp
     N(alarmno)(string) – Set name/text for given alarm
     R(alarmno)(repeatspec) – Set alarm to repeat at repeat spec.
@@ -36,15 +36,15 @@ Possible messages from the Pi:
 Specifications for message contents:
 
     timestamp:  A 4-byte time_t, unix time stamp. Time zones are not supported.
-    actionno:   1 byte, an action identifier (0 disallowed)
+    actionno:   1 byte, an action identifier
     actionspec: (actionmask)(actionargs)
-    actionmask: unit32_t, a mask of available actions (see below) (0 not allowed)
+    actionmask: unit32_t, a mask of available actions (see below)
     actionargs: Four bytes determining snooze behaviour of the alarm:
                 first bit sets snoozability (bool),
                 next 15 bits set timeout (uint16_t),
                 final 16 bits set offset (int16_t)
     alarmno:    1 byte, an alarm identifier
-    string:     ASCII string, '\0' terminated.
+    string:     ASCII string, 12 chars max.
     repeatspec: 1 Byte, determiming repetition behaviour (see below)
 
 
