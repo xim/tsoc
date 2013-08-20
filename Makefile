@@ -19,14 +19,14 @@ raw_upload:
 	@./build raw_upload
 
 reset:
-	make -fMakefile_ reset
+	@make -fMakefile_ reset
 
 size:
 	@./build size
 
 show_boards:
-	make -fMakefile_ show_boards
+	@make -fMakefile_ show_boards
 
 
 build-*/tsoc.hex: *.ino *.c *.h build Make*
-	./build
+	@./build
