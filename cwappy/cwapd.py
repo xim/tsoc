@@ -54,7 +54,7 @@ class ArduinoListener(object):
                 self.collect_garbage()
                 libcwap.action(self.arduino.read)
             except KeyboardInterrupt:
-                should_exit = True
+                self.should_exit = True
         self.arduino.close()
 
     def time_request_function(self):
