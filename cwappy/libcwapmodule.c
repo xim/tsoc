@@ -29,6 +29,8 @@ void call_void(Py_ssize_t index) {
     PyObject * result;
     PyObject * fun;
     fun = PySequence_Fast_GET_ITEM(python_functions, index);
+    if (fun == Py_None)
+        return;
     result = PyObject_CallObject(fun, NULL);
     Py_DECREF(result);
 }
@@ -39,6 +41,8 @@ void call_helper(Py_ssize_t index, const char * format, ...) {
     PyObject * fun;
     PyObject * arglist;
     fun = PySequence_Fast_GET_ITEM(python_functions, index);
+    if (fun == Py_None)
+        return;
     va_start(args, format);
     arglist = Py_VaBuildValue(format, args);
     va_end(args);
@@ -124,7 +128,7 @@ static PyObject * pycwap_register(PyObject *ref, PyObject *args) {
     PyObject *result = NULL;
     PyArg_ParseTuple(args, "O", &python_functions);
     if(!PySequence_Check(python_functions)) {
-        PyErr_SetString(PyExc_TypeError, "register()takes a list of functions");
+        PyErr_SetString(PyExc_TypeError, "register() takes a list of functions");
         return NULL;
     }
     Py_ssize_t len = PySequence_Size(python_functions);
@@ -134,8 +138,8 @@ static PyObject * pycwap_register(PyObject *ref, PyObject *args) {
     }
     for(Py_ssize_t i = 0; i != len; i++) {
         PyObject * tmp = PySequence_Fast_GET_ITEM(python_functions, i);
-        if(!PyCallable_Check(tmp)) {
-            PyErr_SetString(PyExc_TypeError, "All parameters must be callable");
+        if(tmp != Py_None && !PyCallable_Check(tmp)) {
+            PyErr_SetString(PyExc_TypeError, "All parameters must be callable or None");
             return NULL;
         }
     }
