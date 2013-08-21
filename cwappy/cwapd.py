@@ -1,12 +1,22 @@
 #!/usr/bin/python
 
 import datetime
+import os
 import serial
 import threading
 import time
+import shutil
 import subprocess
+import sys
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 import libcwap
+
+PICKLE_PATH = os.path.join(os.path.dirname(sys.argv[0]), 'cwap.pickle')
 
 def str_to_ts(data_str):
     return sum(ord(byte) << ((3 - i) * 8) for i, byte in enumerate(data_str))
@@ -46,6 +56,16 @@ class ArduinoListener(object):
                 data_rate or 9600,
                 timeout=10)
         self.arduino.open()
+        self.load_data()
+
+    def load_data(self):
+        with open(PICKLE_PATH) as fh:
+            self.all_data = pickle.load(fh)
+
+    def save_data(self):
+        with open(PICKLE_PATH + '_') as fh:
+            pickle.dump(self.all_data, fh)
+        shutil.move(PICKLE_PATH + '_', PICKLE_PATH)
 
     def collect_garbage(self):
         old_size = len(self.all_data)
@@ -62,6 +82,7 @@ class ArduinoListener(object):
         while not self.should_exit:
             try:
                 self.collect_garbage()
+                self.save_data()
                 libcwap.action(self.arduino.read)
             except KeyboardInterrupt:
                 self.should_exit = True
