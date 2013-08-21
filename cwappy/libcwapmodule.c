@@ -7,7 +7,7 @@ PyObject * python_functions = NULL;
 static size_t action_read_wrapper(char * buf, size_t size) {
     PyObject *result = NULL;
     PyObject *arglist = NULL;
-    Py_ssize_t ret_size = 0;
+    size_t ret_size = 0;
     arglist = Py_BuildValue("(I)", size);
     result = PyObject_CallObject(serial_reader, arglist);
     Py_DECREF(arglist);
@@ -97,7 +97,8 @@ struct libcwap_functions funs = {
     .alarm_delete = alarm_delete_wrapper,
 };
 
-static PyObject * pycwap_action(PyObject *dummy, PyObject *args) {
+static PyObject * pycwap_action(PyObject *ref, PyObject *args) {
+    (void) ref; // Shoud we decref it?
     PyObject *result = NULL;
 
     if (PyArg_ParseTuple(args, "O:set_callback", &serial_reader)) {
@@ -118,7 +119,8 @@ static PyObject * pycwap_action(PyObject *dummy, PyObject *args) {
     return result;
 }
 
-static PyObject * pycwap_register(PyObject *dummy, PyObject *args) {
+static PyObject * pycwap_register(PyObject *ref, PyObject *args) {
+    (void) ref; // Shoud we decref it?
     PyObject *result = NULL;
     PyArg_ParseTuple(args, "O", &python_functions);
     if(!PySequence_Check(python_functions)) {
