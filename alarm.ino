@@ -50,6 +50,7 @@ static inline void push_front(linked_list_t * list, void * item) {
 static inline void push_behind(linked_list_t * pos_before, void * item) {
     linked_list_t * self = MALLOC_TYPE(linked_list_t);
     self->next = pos_before->next;
+    self->item = item;
     pos_before->next = self;
 }
 
