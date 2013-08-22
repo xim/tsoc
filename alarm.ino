@@ -153,7 +153,7 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
 }
 
 static inline time_t next_repeat(time_t time, weekdays_t repetition) {
-    uint8_t day = get_week_day(time);
+    enum week_day day = get_week_day(time);
     for (uint8_t i = day + 1; i != day; i = ((i + 1) % DAYS_PER_WEEK))
         if (repetition.mask & (1 << i))
             return time + SECS_PER_DAY * ((i - day) % 7);

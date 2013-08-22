@@ -13,7 +13,7 @@ void split_timestamp(time_t time, struct time_data * data){
     time /= MINS_PER_HOUR;
     data->hour = time % HOURS_PER_DAY;
     time /= HOURS_PER_DAY;
-    data->week_day = ((time + Thursday) % DAYS_PER_WEEK);
+    data->week_day = (enum week_day)((time + Thursday) % DAYS_PER_WEEK);
 }
 
 void update_time(void) {

@@ -18,7 +18,7 @@ struct time_data {
   uint8_t second;
   uint8_t minute;
   uint8_t hour;
-  uint8_t week_day;
+  enum week_day week_day;
   //uint8_t day;
   //uint8_t month;
   //uint8_t year;
@@ -39,7 +39,7 @@ typedef void (*request_time_function_t)(void);
 #define get_second(time) (time % SECS_PER_MIN)
 #define get_minute(time) ((time / MINS_PER_HOUR) % MINS_PER_HOUR)
 #define get_hour(time) ((time % SECS_PER_DAY) / SECS_PER_HOUR)
-#define get_week_day(time) (((time / SECS_PER_DAY + Thursday) % DAYS_PER_WEEK))
+#define get_week_day(time) ((enum week_day)(((time / SECS_PER_DAY + Thursday) % DAYS_PER_WEEK)))
 #define minutes_in_seconds(minutes) (minutes * SECS_PER_MIN)
 #define hours_in_seconds(hours) (hours * SECS_PER_HOUR)
 #define days_in_seconds(days) (days * SECS_PER_DAY)
