@@ -57,10 +57,10 @@ static inline alarm_t * get_alarm(uint8_t alarmno) {
     linked_list_t * iterator = alarms;
     while (iterator != NULL) {
         if (GET_MEMBER(iterator, alarm_t, alarmno) == alarmno)
-            break;
+            return GET_ITEM(iterator, alarm_t);
         NEXT(iterator);
     }
-    return GET_ITEM(iterator, alarm_t);
+    return NULL;
 }
 
 static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bool invert) {
