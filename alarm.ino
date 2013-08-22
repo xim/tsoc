@@ -161,11 +161,11 @@ static inline time_t next_repeat(time_t time, weekdays_t repetition) {
     // TODO Here, we should find the next geek day! For now, treat geek_day as every_day!
 }
 
-void alarm_run_if_appropriate(time_t timestamp) {
+void alarm_run_if_appropriate(void) {
     if (action_times == NULL)
         return;
     action_time_t * action_time = GET_ITEM(action_times, action_time_t);
-    if (action_time->timestamp > timestamp)
+    if (action_time->timestamp > current_timestamp)
         return;
 
     if (action_time->actions.flags.snoozable && action_time->actions.flags.inverted) {

@@ -52,14 +52,9 @@ void setup(void) {
     keypad_set_action(menu_action);
 }
 
-static struct time_data current_time_elements;
 void loop(void) {
     update_time();
-    split_timestamp(current_timestamp, &current_time_elements);
-    alarm_run_if_appropriate(current_timestamp);
-    if (last_menu_action_time > (current_timestamp - 30))
-        menu_draw_big_clock(&current_time_elements);
-    else
-        menu_redraw_clock(&current_time_elements);
+    alarm_run_if_appropriate();
+    menu_check_state();
     delay(250);
 }
