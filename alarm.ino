@@ -158,9 +158,9 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
 
 static inline time_t next_repeat(time_t time, weekdays_t repetition) {
     enum week_day day = get_week_day(time);
-    for (uint8_t i = day + 1; i != day; i = ((i + 1) % DAYS_PER_WEEK))
-        if (repetition.mask & (1 << i))
-            return time + SECS_PER_DAY * ((i - day) % 7);
+    for (uint8_t i = 1; i != 8; i++)
+        if (repetition.mask & (1 << ((day + i) % DAYS_PER_WEEK)))
+            return time + SECS_PER_DAY * i;
     return day + SECS_PER_DAY;
     // TODO Here, we should find the next geek day! For now, treat geek_day as every_day!
 }
