@@ -60,6 +60,11 @@ static inline void write_bytes(const uint8_t * data, size_t count) {
         SPI.transfer(*(data + i));
 }
 
+static inline void write_byte(const uint8_t data, size_t count) {
+    for (size_t i = 0 ; i != count ; i++)
+        SPI.transfer(data);
+}
+
 void pcd8544_write_char(char value) {
     if (value == '\n' || value == '\0') {
         // TODO this may not handle all cases, e.g. when a '\0' is the 15th
@@ -74,19 +79,20 @@ void pcd8544_write_char(char value) {
 }
 
 void pcd8544_draw_big_clock(const char * clock) {
-    uint8_t zero = 0;
     for (uint32_t line = 0 ; line != 3 ; line++) {
-        pcd8544_place_cursor(2, line + 1);
-        for (uint32_t i = 0; i != 5 ; i++) {
+        pcd8544_place_cursor(4, line + 1);
+        for (uint32_t i = 0; i != 5 ; i++)
             if ((*(clock + i)) == ':') {
-                write_bytes(colon_24x8[line], 8);
-                write_bytes(&zero, 1);
+                if (current_timestamp % 2)
+                    write_bytes(colon_24x8[line], 8);
+                else
+                    write_byte(0x00, 8);
+                write_byte(0x00, 1);
             } else {
                 // The font data, index 24 * numerical value of the char
                 write_bytes(numbers_24x16[line] + (16 * ((*(clock + i)) - '0')), 16);
-                write_bytes(&zero, 1);
+                write_byte(0x00, 1);
             }
-        }
     }
 }
 
