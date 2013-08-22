@@ -41,6 +41,7 @@ static inline void request_time(void) {
 void setup(void) {
     menu_init();
     menu_title("Initializing...");
+    relay_init();
     libcwap_register(&cwap_functions);
     PI_SERIAL.begin(9600);
     request_time();
