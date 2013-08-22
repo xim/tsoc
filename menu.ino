@@ -35,8 +35,14 @@ void menu_content(const char * content) {
 void menu_check_state(void) {
     char clock[6];
     snprintf(clock, 6, "%02lu:%02lu", get_hour(current_timestamp), get_minute(current_timestamp));
-    if (last_menu_action_time > (current_timestamp - 30))
-        pcd8544_draw_big_clock(clock);
-    else
+    if (last_menu_action_time > (current_timestamp - 15)) {
+        pcd8544_set_backlight_state(true);
         menu_redraw_clock(clock);
+    } else {
+        pcd8544_draw_big_clock(clock);
+        if (backlight_blinking)
+            pcd8544_set_backlight_state(current_timestamp%2);
+        else
+            pcd8544_set_backlight_state(false);
+    }
 }
