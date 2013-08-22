@@ -20,7 +20,7 @@ struct libcwap_functions cwap_functions = {
     .alarm_delete = NULL,
 };
 
-inline void wait_for_time_sync(void) {
+static inline void wait_for_time_sync(void) {
     menu_content("Waiting for time sync, press any key to skip.");
     while (!time_has_been_set && keypad_key_pressed == '\0')
         delay(50);
@@ -34,7 +34,7 @@ void PI_SERIALEVENT() {
     libcwap_action(read_wrapper);
 }
 
-void request_time(void) {
+static inline void request_time(void) {
     PI_SERIAL.write(CWAP_REQUEST_TIME);
 }
 
