@@ -24,7 +24,7 @@ struct libcwap_functions cwap_functions = {
 
 inline void wait_for_time_sync(void) {
     menu_content("Waiting for time sync, press any key to skip.");
-    while (!time_is_set() && keypad_key_pressed == '\0')
+    while (!time_has_been_set && keypad_key_pressed == '\0')
         delay(50);
 }
 
@@ -52,13 +52,12 @@ void setup(void) {
     keypad_set_action(menu_action);
 }
 
-struct time_data current_time_elements;
+static struct time_data current_time_elements;
 void loop(void) {
     update_time();
-    split_timestamp(get_current_timestamp(), &current_time_elements);
-    menu_redraw_clock(&current_time_elements);
-    alarm_run_if_appropriate(get_current_timestamp());
-    if (last_menu_action_time > (get_current_timestamp() - 30))
+    split_timestamp(current_timestamp, &current_time_elements);
+    alarm_run_if_appropriate(current_timestamp);
+    if (last_menu_action_time > (current_timestamp - 30))
         menu_draw_big_clock(&current_time_elements);
     else
         menu_redraw_clock(&current_time_elements);

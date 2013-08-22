@@ -5,6 +5,11 @@
 
 typedef uint32_t time_t;
 
+// Globally available
+static time_t current_timestamp = 0;
+static bool time_has_been_set = false;
+static time_t measured_time_drift = 0;
+
 enum week_day {
     Monday = 0, Tuesday = 1, Wednesday = 2, Thursday = 3, Friday = 4, Saturday = 5, Sunday = 6
 };
@@ -43,10 +48,6 @@ typedef void (*request_time_function_t)(void);
 #define elapsed_seconds_today(time) (time % SECS_PER_DAY)
 #define last_midnight(time) (time - elapsed_seconds_today(time))
 #define next_midnight(time) (last_midnight(time) + SECS_PER_DAY)
-
-time_t get_current_timestamp(void);
-bool time_is_set(void);
-time_t get_measured_time_drift(void);
 
 time_t get_time(void);
 void update_time(void);

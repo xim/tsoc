@@ -1,10 +1,5 @@
 #include "time.h"
 
-// "Globally" available time data through getters
-static time_t current_timestamp = 0;
-static bool time_has_been_set = false;
-static time_t measured_time_drift = 0;
-
 static uint32_t sync_interval = 300;
 static uint32_t previous_millis = 0;
 static uint32_t next_sync_threshold = 0;
@@ -54,14 +49,4 @@ void set_time_requester(request_time_function_t requester) {
 void set_sync_interval(time_t interval) {
     next_sync_threshold += interval - sync_interval;
     sync_interval = interval;
-}
-
-time_t get_current_timestamp(void) {
-    return current_timestamp;
-}
-bool time_is_set(void) {
-    return time_has_been_set;
-}
-time_t get_measured_time_drift(void) {
-    return measured_time_drift;
 }
