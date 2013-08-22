@@ -1,3 +1,4 @@
+#include "action.h"
 #include "alarm.h"
 #include "libcwap.h"
 #include "linked_list.h"
@@ -151,14 +152,6 @@ static inline time_t next_repeat(time_t time, weekdays_t repetition) {
             return time + SECS_PER_DAY * ((i - day) % 7);
     return day + SECS_PER_DAY;
     // TODO Here, we should find the next geek day! For now, treat geek_day as every_day!
-}
-
-static inline void perform_action(actionspec_t * actionspec) {
-    // TODO Actually do what the spec says.
-    (void) actionspec;
-    struct time_data time_elements;
-    split_timestamp(0, &time_elements);
-    menu_draw_big_clock(&time_elements);
 }
 
 void alarm_run_if_appropriate(time_t timestamp) {
