@@ -22,6 +22,7 @@ void menu_draw_big_clock(struct time_data * time) {
 }
 
 void menu_action(char button) {
+    last_menu_action_time = current_timestamp;
     char data[27];
     snprintf(data, 27, "The button '%c' was pressed", button);
     menu_content(data);

@@ -58,5 +58,9 @@ void loop(void) {
     split_timestamp(get_current_timestamp(), &current_time_elements);
     menu_redraw_clock(&current_time_elements);
     alarm_run_if_appropriate(get_current_timestamp());
+    if (last_menu_action_time > (get_current_timestamp() - 30))
+        menu_draw_big_clock(&current_time_elements);
+    else
+        menu_redraw_clock(&current_time_elements);
     delay(250);
 }
