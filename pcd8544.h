@@ -69,5 +69,11 @@ void pcd8544_write_char(char);
 void pcd8544_write_string(const char *);
 void pcd8544_draw_big_clock(const char *);
 void pcd8544_newline();
-void pcd8544_set_backlight_state(bool);
+
+inline void pcd8544_set_backlight_state(bool value) {
+    digitalWrite(PCD8544_PIN_BL, value);
+}
+inline bool pcd8544_backlight_state(void) {
+    return digitalRead(PCD8544_PIN_BL);
+}
 #endif

@@ -111,7 +111,3 @@ void pcd8544_newline(void) {
         inc_col();
     }
 }
-
-void pcd8544_set_backlight_state(bool value) {
-    digitalWrite(PCD8544_PIN_BL, value);
-}
