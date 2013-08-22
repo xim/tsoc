@@ -10,7 +10,7 @@
 
 // Most basic functionality – detect if a key has been pressed.
 // Set by keypad_set_keypad_pressed
-bool keypad_pressed(void);
+char keypad_key_pressed = '\0';
 
 // Init the keypad, setting up interrupts/pins
 void keypad_init(void);
@@ -19,5 +19,5 @@ void keypad_init(void);
 void keypad_set_action(void (*)(char));
 
 // Sets the keypad_pressed variable to true on the first button press.
-void keypad_set_keypad_pressed(char);
+void keypad_set_key_pressed(char);
 #endif

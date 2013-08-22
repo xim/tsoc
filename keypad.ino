@@ -4,9 +4,7 @@
 
 #include "keypad.h"
 
-void (*action_function)(char) = keypad_set_keypad_pressed;
-
-bool keypad_has_been_pressed = false;
+void (*action_function)(char) = keypad_set_key_pressed;
 
 #define FIFO_SIZE 8
 static char presses[FIFO_SIZE];
@@ -88,11 +86,6 @@ void keypad_set_action(void (*function)(char)) {
     action_function = function;
 }
 
-void keypad_set_keypad_pressed(char key) {
-    (void) key;
-    keypad_has_been_pressed = true;
-}
-
-bool keypad_pressed(void) {
-    return keypad_has_been_pressed;
+void keypad_set_key_pressed(char key) {
+    keypad_key_pressed = key;
 }
