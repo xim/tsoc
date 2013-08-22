@@ -66,9 +66,7 @@ static inline void write_byte(const uint8_t data, size_t count) {
 }
 
 void pcd8544_write_char(char value) {
-    if (value == '\n' || value == '\0') {
-        // TODO this may not handle all cases, e.g. when a '\0' is the 15th
-        // char of a line...
+    if (value == '\n' || (value == '\0' && current_col != 0)) {
         pcd8544_newline();
         return;
     }
