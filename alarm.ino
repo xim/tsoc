@@ -106,6 +106,10 @@ static inline void clear_actions(uint8_t alarmno) {
     }
 }
 
+void alarm_set_default_timestamp(time_t timestamp) {
+    alarm_time_set_t req = {0, timestamp};
+    alarm_set_timestamp(&req);
+}
 void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
     clear_actions(alarm_req->alarmno);
 
@@ -187,5 +191,21 @@ void alarm_run_if_appropriate(void) {
         perform_action(&action_time->actions);
 
     pop_head(action_times);
+}
 
+bool alarm_set(void) {
+    return action_times != NULL;
+}
+
+time_t next_alarm_time(void) {
+    time_t lowest_time = LARGEST_TIMESTAMP;
+    time_t current_alarm;
+    linked_list_t * iterator = alarms;
+    while (iterator != NULL) {
+        current_alarm = GET_MEMBER(iterator, alarm_t, timestamp);
+        if (current_timestamp < current_timestamp && current_alarm < lowest_time)
+            lowest_time = current_alarm;
+        NEXT(iterator);
+    }
+    return lowest_time;
 }

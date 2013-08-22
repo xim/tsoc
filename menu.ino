@@ -45,4 +45,5 @@ void menu_check_state(void) {
         else
             pcd8544_set_backlight_state(false);
     }
+
 }

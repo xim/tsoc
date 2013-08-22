@@ -5,6 +5,8 @@
 
 typedef uint32_t time_t;
 
+#define LARGEST_TIMESTAMP (0xFFFFFFFF)
+
 // Globally available
 static time_t current_timestamp = 0;
 static bool time_has_been_set = false;
