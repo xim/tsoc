@@ -3,9 +3,7 @@
 #include "libcwap.h"
 #include "menu.h"
 #include "time.h"
-
-#define PI_SERIAL Serial
-#define PI_SERIALEVENT SerialEvent
+#include "serial.h"
 
 struct libcwap_functions cwap_functions = {
     .time_request_function = NULL,
