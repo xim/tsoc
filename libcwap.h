@@ -31,20 +31,16 @@ typedef size_t (*read_function_t)(char *, size_t);
 #define CWAP_ALARM_NAME_LENGTH 12
 
 typedef union {
-    uint32_t mask;
+    uint16_t mask;
     struct PACKED {
+        bool inverse : 1;
         bool enable_relay_1 : 1;
-        bool disable_relay_1 : 1;
         bool enable_relay_2 : 1;
-        bool disable_relay_2 : 1;
         bool enable_relay_3 : 1;
-        bool disable_relay_3 : 1;
         bool enable_relay_4 : 1;
-        bool disable_relay_4 : 1; // eighth bit
-
         bool blink_backlight : 1;
         bool make_noise : 1;
-        bool speaking_clock : 1; // eleventh bit
+        bool speaking_clock : 1;
     } flags;
 } actionmask_t;
 
