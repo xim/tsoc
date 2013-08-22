@@ -33,7 +33,10 @@ typedef size_t (*read_function_t)(char *, size_t);
 typedef union {
     uint16_t mask;
     struct PACKED {
-        bool inverse : 1;
+        bool snoozable : 1; // Action affected by snoozes
+        bool inverted : 1; // Do the opposite of what the flags says
+        // These two flags together hold special significance – it means it's a
+        // main alarm event. So never permit making inverted actions anywhere!
         bool enable_relay_1 : 1;
         bool enable_relay_2 : 1;
         bool enable_relay_3 : 1;
@@ -46,8 +49,7 @@ typedef union {
 
 typedef struct PACKED {
     actionmask_t actions;
-    bool snoozability : 1;
-    uint16_t timeout : 15; // uint15_t!
+    uint16_t timeout;
     int16_t offset;
 } actionspec_t;
 

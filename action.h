@@ -1,3 +1,3 @@
 #include "libcwap.h"
 
-void perform_action(actionspec_t * );
+void perform_action(actionmask_t *);

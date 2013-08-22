@@ -21,7 +21,7 @@ typedef struct {
 typedef struct {
     uint8_t alarmno;
     time_t timestamp;
-    actionspec_t actionspec;
+    actionmask_t actions;
 } action_time_t;
 
 static linked_list_t * actions = NULL;
@@ -50,7 +50,6 @@ static inline actionspec_t * new_actionspec(void) {
     empty->timeout = 0;
     empty->offset = 0;
     empty->actions.mask = 0;
-    empty->snoozability = 0;
     return empty;
 }
 
@@ -64,8 +63,10 @@ static inline alarm_t * get_alarm(uint8_t alarmno) {
     return GET_ITEM(iterator, alarm_t);
 }
 
-static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec) {
+static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bool invert) {
     time_t action_timestamp = alarm->timestamp + actionspec->offset;
+    if (invert)
+        action_timestamp += actionspec->timeout;
 
     linked_list_t * insert_pos = NULL;
     linked_list_t * iterator = action_times;
@@ -76,12 +77,17 @@ static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec) {
     action_time_t * action_time = MALLOC_TYPE(action_time_t);
     action_time->alarmno = alarm->alarmno;
     action_time->timestamp = action_timestamp;
-    action_time->actionspec = *actionspec;
+    action_time->actions = actionspec->actions;
+
+    if (invert)
+        action_time->actions.flags.inverted = true;
 
     if (insert_pos == NULL)
         push_front(action_times, action_time);
     else
         push_behind(insert_pos, action_time);
+    if (!actionspec->actions.flags.inverted)
+        prepare_action(alarm, actionspec, true);
 }
 
 static inline void clear_actions(uint8_t alarmno) {
@@ -114,8 +120,9 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
             action = GET_ITEM(actions, action_t);
         else {
             actionspec_t * actionspec = new_actionspec();
+            // TODO This is a temp. default action
             actionspec->actions.flags.blink_backlight = true;
-            actionspec->snoozability = true;
+            actionspec->actions.flags.snoozable = true;
             actionspec->timeout = 0x7FFF;
 
             action = new_action();
@@ -126,7 +133,7 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
         push_front(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
     }
 
-    prepare_action(alarm, new_actionspec());
+    prepare_action(alarm, new_actionspec(), false);
     linked_list_t * iterator = alarm->actionnos;
     while (iterator != NULL) {
         uint8_t actionno = *GET_ITEM(iterator, uint8_t);
@@ -135,7 +142,7 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
             if (actionno == GET_MEMBER(action_iterator, action_t, actionno)) {
                 linked_list_t * actionspec_iterator = GET_MEMBER(action_iterator, action_t, actionspecs);
                 while (actionspec_iterator != NULL) {
-                    prepare_action(alarm, GET_ITEM(actionspec_iterator, actionspec_t));
+                    prepare_action(alarm, GET_ITEM(actionspec_iterator, actionspec_t), false);
                     NEXT(actionspec_iterator);
                 }
             }
@@ -161,8 +168,7 @@ void alarm_run_if_appropriate(time_t timestamp) {
     if (action_time->timestamp > timestamp)
         return;
 
-    // TODO document that empty actions == actual alarm time?
-    if (!action_time->actionspec.actions.mask) {
+    if (action_time->actions.flags.snoozable && action_time->actions.flags.inverted) {
         alarm_t * alarm = get_alarm(action_time->alarmno);
         if (alarm != NULL && alarm->repetition.mask) { // Not having an alarm here should be impossible?
             alarm_time_set_t next_run;
@@ -178,7 +184,7 @@ void alarm_run_if_appropriate(time_t timestamp) {
         else
             menu_content("Unnamed");
     } else
-        perform_action(&action_time->actionspec);
+        perform_action(&action_time->actions);
 
     pop_head(action_times);
 
