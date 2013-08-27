@@ -10,13 +10,13 @@ static inline void send_cwap_message(char type) {
 
 void perform_action(actionmask_t * actions) {
     if (actions->flags.enable_relay_1)
-        set_relay_state(1, !actions->flags.inverted);
+        set_relay_state(0, !actions->flags.inverted);
     if (actions->flags.enable_relay_2)
-        set_relay_state(2, !actions->flags.inverted);
+        set_relay_state(1, !actions->flags.inverted);
     if (actions->flags.enable_relay_3)
-        set_relay_state(3, !actions->flags.inverted);
+        set_relay_state(2, !actions->flags.inverted);
     if (actions->flags.enable_relay_4)
-        set_relay_state(4, !actions->flags.inverted);
+        set_relay_state(3, !actions->flags.inverted);
     if (actions->flags.blink_backlight)
         backlight_blinking = !actions->flags.inverted;
 
