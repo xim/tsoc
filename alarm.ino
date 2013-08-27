@@ -157,10 +157,7 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
     }
 
     // Magical action that tells us the main part of the alarm is running.
-    actionspec_t * main_action = new_actionspec();
-    main_action->actions.flags.snoozable = true;
-    main_action->actions.flags.inverted = true;
-    prepare_action(alarm, main_action, false);
+    prepare_action(alarm->alarmno, alarm->timestamp, new_actionspec(), false);
 
     // Iterate over all actions for the alarm, add them to the queue.
     linked_list_t * iterator = alarm->actionnos;
@@ -198,7 +195,7 @@ void alarm_run_if_appropriate(void) {
     if (action_time->timestamp > current_timestamp)
         return;
 
-    if (action_time->actions.flags.snoozable && action_time->actions.flags.inverted) {
+    if (!action_time->actions.mask) { // Is main alarm object
         alarm_t * alarm = get_alarm(action_time->alarmno);
         if (alarm != NULL && alarm->repetition.mask) { // Not having an alarm here should be impossible?
             alarm_time_set_t next_run;

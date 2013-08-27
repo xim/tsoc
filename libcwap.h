@@ -32,12 +32,11 @@ typedef size_t (*read_function_t)(char *, size_t);
 #define CWAP_ALARM_NAME_LENGTH 12
 
 typedef union {
+    // TODO Document that (mask == 0) means it's the start of the alarm
     uint16_t mask;
     struct PACKED {
         bool snoozable : 1; // Action affected by snoozes
         bool inverted : 1; // Do the opposite of what the flags says
-        // These two flags together hold special significance – it means it's a
-        // main alarm event. So never permit making inverted actions anywhere!
         bool enable_relay_1 : 1;
         bool enable_relay_2 : 1;
         bool enable_relay_3 : 1;
