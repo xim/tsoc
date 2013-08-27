@@ -2,7 +2,7 @@
 #define RELAY_H
 
 #ifndef RELAY_PIN_RANGE_START
-#define RELAY_PIN_RANGE_START 50
+#define RELAY_PIN_RANGE_START 22
 #endif
 #ifndef RELAY_PIN_COUNT
 #define RELAY_PIN_COUNT 4
