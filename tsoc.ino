@@ -22,7 +22,9 @@ struct libcwap_functions cwap_functions = {
 
 static inline void wait_for_time_sync(void) {
     menu_content("Waiting for time sync, press any key to skip.");
-    while (!time_has_been_set && keypad_key_pressed == '\0')
+    while (!time_has_been_set && keypad_key_pressed == '\0') {
+        if (keypad_interrupt_queued)
+            keypad_handle_presses();
         delay(50);
 }
 
@@ -55,5 +57,7 @@ void loop(void) {
     update_time();
     alarm_run_if_appropriate();
     menu_check_state();
-    delay(250);
+    if (keypad_interrupt_queued)
+        keypad_handle_presses();
+    delay(50);
 }

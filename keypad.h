@@ -9,6 +9,11 @@
 #define INTERRUPT_BASE 2
 
 // Most basic functionality – detect if a key has been pressed.
+volatile bool keypad_interrupt_queued = false;
+
+// Should be run as soon as possible after keypad_interrupt_queued
+void keypad_handle_presses(void);
+
 // Set by keypad_set_keypad_pressed
 char keypad_key_pressed = '\0';
 

@@ -1,10 +1,8 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
 #include <stdlib.h>
 
 #include "keypad.h"
 
-void (*action_function)(char) = keypad_set_key_pressed;
+void (*action_function)(char) = NULL;
 
 #define FIFO_SIZE 8
 static char presses[FIFO_SIZE];
@@ -33,16 +31,31 @@ static inline void queue_key(char key) {
     uint8_t next_tail = (tail + 1) % FIFO_SIZE;
     if (next_tail == head)
         return;
-    tail = next_tail;
     presses[tail] = key;
+    tail = next_tail;
+}
+
+static inline void disable_interrupts(void) {
+    for (volatile uint8_t i = 0; i != KEYPAD_NUM_ROWS_COLS ; i++)
+        detachInterrupt(INTERRUPT_BASE + i);
+}
+
+void handle_interrupt(void) {
+    keypad_interrupt_queued = true;
+    disable_interrupts();
+}
+
+static inline void enable_interrupts(void) {
+    for (uint8_t i = 0; i != KEYPAD_NUM_ROWS_COLS ; i++)
+        attachInterrupt(INTERRUPT_BASE + i, handle_interrupt, CHANGE);
 }
 
 #define has_press(row) (!digitalRead(KEYPAD_ROW_PIN_BASE + row))
 #define was_pressed(bitmask) (buttons_held & bitmask)
-void handle_interrupt(void) {
-    noInterrupts();
+void keypad_handle_presses(void) {
+    keypad_interrupt_queued = false;
     if (action_function == NULL) {
-        interrupts();
+        enable_interrupts();
         return;
     }
 
@@ -59,27 +72,18 @@ void handle_interrupt(void) {
                     queue_key(buttons[i][j]);
                 }
             } else if (was_pressed(bitmask))
-                buttons_held &= (bitmask ^ 0xFF);
+                buttons_held &= (bitmask ^ 0xFFFF);
         }
         digitalWrite(KEYPAD_COL_PIN_BASE + i, HIGH);
     }
 
     for (uint8_t i = 0; i != KEYPAD_NUM_ROWS_COLS ; i++)
         digitalWrite(KEYPAD_COL_PIN_BASE + i, LOW);
-    interrupts();
+    enable_interrupts();
 
     char keypress;
     while ((keypress = dequeue_key()) != '\0')
         action_function(keypress);
-}
-
-void keypad_init(void) {
-    for (uint8_t i = 0; i != KEYPAD_NUM_ROWS_COLS ; i++) {
-        pinMode(KEYPAD_COL_PIN_BASE + i, OUTPUT);
-        digitalWrite(KEYPAD_COL_PIN_BASE + i, LOW);
-        pinMode(KEYPAD_ROW_PIN_BASE + i, INPUT_PULLUP);
-        attachInterrupt(INTERRUPT_BASE + i, handle_interrupt, CHANGE);
-    }
 }
 
 void keypad_set_action(void (*function)(char)) {
@@ -88,4 +92,14 @@ void keypad_set_action(void (*function)(char)) {
 
 void keypad_set_key_pressed(char key) {
     keypad_key_pressed = key;
+}
+
+void keypad_init(void) {
+    action_function = keypad_set_key_pressed;
+    for (uint8_t i = 0; i != KEYPAD_NUM_ROWS_COLS ; i++) {
+        pinMode(KEYPAD_COL_PIN_BASE + i, OUTPUT);
+        digitalWrite(KEYPAD_COL_PIN_BASE + i, LOW);
+        pinMode(KEYPAD_ROW_PIN_BASE + i, INPUT_PULLUP);
+    }
+    enable_interrupts();
 }
