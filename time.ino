@@ -30,7 +30,6 @@ time_t get_time(void) {
 }
 
 void set_time(time_t t) {
-    update_time();
     next_sync_threshold = t + sync_interval;
     if (time_has_been_set) {
         measured_time_drift += current_timestamp - t;
