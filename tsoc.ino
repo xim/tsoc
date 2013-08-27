@@ -25,7 +25,7 @@ size_t read_wrapper(char * buf, size_t size) {
 }
 
 static inline void wait_for_time_sync(void) {
-    menu_content("Waiting for time sync, press any key to skip.");
+    menu_content("\nWaiting for   time sync,    press any key to skip.");
     while (!time_has_been_set && keypad_key_pressed == '\0') {
         if (PI_SERIAL.available())
             libcwap_action(read_wrapper);
@@ -33,6 +33,7 @@ static inline void wait_for_time_sync(void) {
             keypad_handle_presses();
         delay(50);
     }
+    menu_clear();
 }
 
 static inline void request_time(void) {
@@ -41,15 +42,15 @@ static inline void request_time(void) {
 
 void setup(void) {
     menu_init();
-    menu_title("Initializing...");
+    menu_title("Initializing");
     relay_init();
     libcwap_register(&cwap_functions);
     PI_SERIAL.begin(9600);
-    request_time();
     set_time_requester(request_time);
     keypad_init();
     wait_for_time_sync();
     keypad_set_action(menu_action);
+    menu_clear();
 }
 
 void loop(void) {
