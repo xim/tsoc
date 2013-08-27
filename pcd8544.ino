@@ -7,15 +7,21 @@
 #define pcd8544_set_is_data() digitalWrite(PCD8544_PIN_DC, 1)
 #define pcd8544_set_is_command() digitalWrite(PCD8544_PIN_DC, 0)
 
-static uint8_t current_col = 0;
+static uint8_t current_x = 0;
 static uint8_t current_line = 0;
 
-static inline void inc_col(void) {
-    if (++current_col >= PCD8544_COLS) {
-        current_col = 0;
-        if (++current_line >= PCD8544_LINES)
-            current_line = 0;
+static inline void inc_x(uint8_t count) {
+    current_x += count;
+    if (current_x >= PCD8544_WIDTH) {
+        current_line += current_x / PCD8544_WIDTH;
+        current_x %= PCD8544_WIDTH;
+        if (current_line >= PCD8544_LINES)
+            current_line %= PCD8544_LINES;
     }
+}
+
+static inline void inc_col(void) {
+    inc_x(6);
 }
 
 void pcd8544_init(void) {
@@ -40,19 +46,23 @@ void pcd8544_init(void) {
     pcd8544_set_is_data();
 }
 
-void pcd8544_place_cursor(uint8_t column, uint8_t line) {
+void pcd8544_place_cursor_precise(uint8_t x, uint8_t line) {
     if (line >= PCD8544_LINES)
         line %= PCD8544_LINES;
-    if (column >= PCD8544_COLS)
-        column %= PCD8544_COLS;
-    // Yes, x is pixel addressed, y is line addressed This makes sense because
+    if (x >= PCD8544_WIDTH)
+        x %= PCD8544_WIDTH;
+    // Yes, x is pixel addressed, y is line addressed. This makes sense because
     // we write 8 pixels at a time.
-    current_col = column;
+    current_x = x;
     current_line = line;
     pcd8544_set_is_command();
-    SPI.transfer(PCD8544_SET_X_ADDRESS | (current_col * 6));
+    SPI.transfer(PCD8544_SET_X_ADDRESS | (current_x));
     SPI.transfer(PCD8544_SET_LINE_ADDRESS | current_line);
     pcd8544_set_is_data();
+}
+
+void pcd8544_place_cursor(uint8_t column, uint8_t line) {
+    pcd8544_place_cursor_precise(column * 6, line);
 }
 
 static inline void write_bytes(const uint8_t * data, size_t count) {
@@ -77,8 +87,9 @@ void pcd8544_write_char(char value) {
 }
 
 void pcd8544_draw_big_clock(const char * clock) {
+    pcd8544_place_cursor_precise(0, 1);
     for (uint32_t line = 0 ; line != 3 ; line++) {
-        pcd8544_place_cursor(4, line + 1);
+        write_byte(0x00, 3);
         for (uint32_t i = 0; i != 5 ; i++)
             if ((*(clock + i)) == ':') {
                 if (current_timestamp % 2)
@@ -91,6 +102,7 @@ void pcd8544_draw_big_clock(const char * clock) {
                 write_bytes(numbers_24x16[line] + (16 * ((*(clock + i)) - '0')), 16);
                 write_byte(0x00, 1);
             }
+        write_byte(0x00, 4);
     }
 }
 
@@ -109,9 +121,8 @@ void pcd8544_clear(void) {
 }
 
 void pcd8544_newline(void) {
-    while (current_col != 0) {
-        for (uint8_t i = 0; i != 6; i++)
-            SPI.transfer(0x00);
-        inc_col();
-    }
+    uint8_t n = PCD8544_WIDTH - current_x;
+    for (uint8_t i = 0; i != n; i++)
+        SPI.transfer(0x00);
+    inc_x(n);
 }
