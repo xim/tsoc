@@ -76,8 +76,13 @@ static inline void write_byte(const uint8_t data, size_t count) {
 }
 
 void pcd8544_write_char(char value) {
-    if (value == '\n' || (value == '\0' && current_col != 0)) {
+    if (value == '\n') {
         pcd8544_newline();
+        return;
+    }
+    if (value == '\0') {
+        if (current_x != 0)
+            pcd8544_newline();
         return;
     }
     const uint8_t * data = ASCII[value - ' '];
