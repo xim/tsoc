@@ -16,6 +16,7 @@ typedef size_t (*read_function_t)(char *, size_t);
 #define CWAP_REQUEST_TIME '\t'
 #define CWAP_REQUEST_SPEAKING_CLOCK '\v'
 #define CWAP_REQUEST_NOISE '\n'
+#define CWAP_REQUEST_NOISE_STOP '\r'
 #define CWAP_REQUEST_ALL_ALARMS '\a'
 
 #define CWAP_SET_TIME 'T'
@@ -96,6 +97,7 @@ struct libcwap_functions {
     void (*time_request_function)(void);
     void (*speaking_clock_request_function)(timestamp_t);
     void (*noise_request_function)(void);
+    void (*noise_request_stop_function)(void);
     void (*alarms_request_function)(void);
 
     void (*time_set_function)(timestamp_t);

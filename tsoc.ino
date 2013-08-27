@@ -9,6 +9,7 @@ struct libcwap_functions cwap_functions = {
     .time_request_function = NULL,
     .speaking_clock_request_function = NULL,
     .noise_request_function = NULL,
+    .noise_request_stop_function = NULL,
     .alarms_request_function = NULL,
 
     .time_set_function = set_time,

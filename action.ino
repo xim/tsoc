@@ -21,8 +21,16 @@ void perform_action(actionmask_t * actions) {
         backlight_blinking = !actions->flags.inverted;
 
     // TODO can we cancel these? Nope!
-    if (actions->flags.make_noise)
-        send_cwap_message(CWAP_REQUEST_NOISE);
-    if (actions->flags.speaking_clock)
-        send_cwap_message(CWAP_REQUEST_SPEAKING_CLOCK);
+    if (actions->flags.make_noise) {
+        if (actions->flags.inverted)
+            send_cwap_message(CWAP_REQUEST_NOISE_STOP);
+        else
+            send_cwap_message(CWAP_REQUEST_NOISE);
+    }
+    if (actions->flags.speaking_clock) {
+        if (actions->flags.inverted)
+            send_cwap_message(CWAP_REQUEST_NOISE_STOP);
+        else
+            send_cwap_message(CWAP_REQUEST_SPEAKING_CLOCK);
+    }
 }

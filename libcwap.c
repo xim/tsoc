@@ -39,6 +39,7 @@ void libcwap_action(read_function_t read_function) {
         case CWAP_REQUEST_TIME: HANDLE_VOID(time_request_function);
         case CWAP_REQUEST_SPEAKING_CLOCK: HANDLE_SIMPLE(speaking_clock_request_function, timestamp_t);
         case CWAP_REQUEST_NOISE: HANDLE_VOID(noise_request_function);
+        case CWAP_REQUEST_NOISE_STOP: HANDLE_VOID(noise_request_stop_function);
         case CWAP_REQUEST_ALL_ALARMS: HANDLE_VOID(alarms_request_function);
 
         case CWAP_SET_TIME: HANDLE_SIMPLE(time_set_function, timestamp_t);

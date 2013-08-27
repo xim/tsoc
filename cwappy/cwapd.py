@@ -24,10 +24,17 @@ def str_to_ts(data_str):
 class NoiseMaker(threading.Thread):
     def __init__(self):
         self.daemon = True
+        self.should_run=True
         super(NoiseMaker, self).__init__()
 
     def run(self):
-        subprocess.call(('aplay', 'noise.wav'))
+        while self.should_run:
+            for fn in os.listdir('noise'):
+                subprocess.call(('mpg123', 'noise/' + fn))
+
+    def stop(self):
+        self.should_run = False
+        subprocess.call(('pkill', '-2', 'mpg123'))
 
 class ArduinoListener(object):
 
@@ -39,6 +46,7 @@ class ArduinoListener(object):
             self.time_request_function,
             self.speaking_clock_request_function,
             self.noise_request_function,
+            self.noise_stop_request_function,
             self.alarms_request_function,
 
             None, #time_set_function
@@ -52,7 +60,7 @@ class ArduinoListener(object):
         libcwap.register(self.actions)
 
         self.arduino = serial.Serial(
-                serial_port or '/dev/ttyUSB0',
+                serial_port or '/dev/ttyACM0',
                 data_rate or 9600,
                 timeout=10)
         self.arduino.open()
@@ -105,8 +113,15 @@ class ArduinoListener(object):
 
     def noise_request_function(self):
         self.info('Speaking time using headphone output')
-        noiser = NoiseMaker()
-        noiser.start()
+        self.noiser = NoiseMaker()
+        self.noiser.start()
+
+    def noise_stop_request_function(self):
+        self.info('Stopping noise')
+        if hasattr(self, 'noiser'):
+            self.noiser.stop()
+            self.noiser.join()
+            del self.noiser
 
     def alarms_request_function(self):
         self.info('Sending all alarm data over serial')
