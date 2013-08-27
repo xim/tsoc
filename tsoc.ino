@@ -20,20 +20,19 @@ struct libcwap_functions cwap_functions = {
     .alarm_delete = NULL,
 };
 
-static inline void wait_for_time_sync(void) {
-    menu_content("Waiting for time sync, press any key to skip.");
-    while (!time_has_been_set && keypad_key_pressed == '\0') {
-        if (keypad_interrupt_queued)
-            keypad_handle_presses();
-        delay(50);
-}
-
 size_t read_wrapper(char * buf, size_t size) {
     return PI_SERIAL.readBytes(buf, size);
 }
 
-void PI_SERIALEVENT() {
-    libcwap_action(read_wrapper);
+static inline void wait_for_time_sync(void) {
+    menu_content("Waiting for time sync, press any key to skip.");
+    while (!time_has_been_set && keypad_key_pressed == '\0') {
+        if (PI_SERIAL.available())
+            libcwap_action(read_wrapper);
+        if (keypad_interrupt_queued)
+            keypad_handle_presses();
+        delay(50);
+    }
 }
 
 static inline void request_time(void) {
@@ -57,6 +56,8 @@ void loop(void) {
     update_time();
     alarm_run_if_appropriate();
     menu_check_state();
+    if (PI_SERIAL.available())
+        libcwap_action(read_wrapper);
     if (keypad_interrupt_queued)
         keypad_handle_presses();
     delay(50);
