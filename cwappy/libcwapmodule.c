@@ -132,8 +132,8 @@ static PyObject * pycwap_register(PyObject *ref, PyObject *args) {
         return NULL;
     }
     Py_ssize_t len = PySequence_Size(python_functions);
-    if(len != 11) {
-        PyErr_SetString(PyExc_ValueError, "register() takes exactly 11 elements");
+    if (len != (sizeof(struct libcwap_functions) / sizeof(void(*)(void)))) {
+        PyErr_SetString(PyExc_ValueError, "register() argument must match struct libcwap_functions");
         return NULL;
     }
     for(Py_ssize_t i = 0; i != len; i++) {
