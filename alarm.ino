@@ -63,8 +63,19 @@ static inline alarm_t * get_alarm(uint8_t alarmno) {
     return NULL;
 }
 
+static inline action_t * get_action(uint8_t actionno) {
+    linked_list_t * iterator = actions;
+    while (iterator != NULL) {
+        if (GET_MEMBER(iterator, action_t, actionno) == actionno)
+            return GET_ITEM(iterator, action_t);
+        NEXT(iterator);
+    }
+    return NULL;
+}
+
 static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bool invert) {
     time_t action_timestamp = alarm->timestamp + actionspec->offset;
+
     if (invert)
         action_timestamp += actionspec->timeout;
 
@@ -78,15 +89,14 @@ static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bo
     action_time->alarmno = alarm->alarmno;
     action_time->timestamp = action_timestamp;
     action_time->actions = actionspec->actions;
-
-    if (invert)
-        action_time->actions.flags.inverted = true;
+    action_time->actions.flags.inverted = invert;
 
     if (insert_pos == NULL)
         PUSH_FRONT(action_times, action_time);
     else
         PUSH_BEHIND(insert_pos, action_time);
-    if (!actionspec->actions.flags.inverted)
+
+    if (!invert)
         prepare_action(alarm, actionspec, true);
 }
 
@@ -115,32 +125,48 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
 
     alarm_t * alarm = get_alarm(alarm_req->alarmno);
 
+    // If alarm doesn't exist, create a default action set.
     if (alarm == NULL) {
         alarm = new_alarm(alarm_req->alarmno, alarm_req->timestamp);
         alarm->name = strdup("Default");
-        push_front(alarms, (void *) alarm);
-        action_t * action;
-        if (actions != NULL)
-            action = GET_ITEM(actions, action_t);
-        else {
-            actionspec_t * actionspec = new_actionspec();
-            // TODO This is a temp. default action
-            actionspec->actions.flags.blink_backlight = true;
-            actionspec->actions.flags.snoozable = true;
-            actionspec->timeout = 0x7FFF;
+        PUSH_FRONT(alarms, (void *) alarm);
+
+        action_t * action = get_action(0);
+        if (action == NULL) {
+            actionspec_t * annoy_action = new_actionspec();
+            annoy_action->actions.flags.blink_backlight = true;
+            annoy_action->actions.flags.make_noise = true;
+            annoy_action->actions.flags.snoozable = true;
+            annoy_action->timeout = 0x7FFF;
+            actionspec_t * coffee_action = new_actionspec();
+            coffee_action->actions.flags.enable_relay_4 = true;
+            coffee_action->offset = -60;
+            coffee_action->timeout = 300;
+            actionspec_t * light_action = new_actionspec();
+            light_action->actions.flags.enable_relay_3 = true;
+            light_action->offset = -120;
+            light_action->timeout = 3600;
 
             action = new_action();
-            PUSH_FRONT(action->actionspecs, (void *) actionspec);
+            PUSH_FRONT(action->actionspecs, (void *) annoy_action);
+            PUSH_FRONT(action->actionspecs, (void *) coffee_action);
+            PUSH_FRONT(action->actionspecs, (void *) light_action);
             PUSH_FRONT(actions, (void *) action);
-            PUSH_FRONT(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
         }
         PUSH_FRONT(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
     }
 
-    prepare_action(alarm, new_actionspec(), false);
+    // Magical action that tells us the main part of the alarm is running.
+    actionspec_t * main_action = new_actionspec();
+    main_action->actions.flags.snoozable = true;
+    main_action->actions.flags.inverted = true;
+    prepare_action(alarm, main_action, false);
+
+    // Iterate over all actions for the alarm, add them to the queue.
     linked_list_t * iterator = alarm->actionnos;
     while (iterator != NULL) {
         uint8_t actionno = *GET_ITEM(iterator, uint8_t);
+
         linked_list_t * action_iterator = actions;
         while (action_iterator != NULL) {
             if (actionno == GET_MEMBER(action_iterator, action_t, actionno)) {
@@ -181,12 +207,15 @@ void alarm_run_if_appropriate(void) {
             alarm_set_timestamp(&next_run);
         }
         // TODO Remember to keep meta of where we are – are any actions
-        // running, are we snoozed, etc.
-        menu_title("Alarm ringing:");
-        if (alarm != NULL && alarm->name != NULL)
-            menu_content(alarm->name);
-        else
-            menu_content("Unnamed");
+        // running, are we snoozed, etc. ... and also make the menu reflect the
+        // state, showing alarm name etc.
+        menu_title("Alarm ringing!");
+        if (alarm != NULL && alarm->name != NULL) {
+            char content[16];
+            sprintf(content, "\n\n\n%s", alarm->name);
+            menu_content(content);
+        } else
+            menu_content("\n\n\nUnnamed");
     } else
         perform_action(&action_time->actions);
 
