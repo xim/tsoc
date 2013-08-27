@@ -4,8 +4,8 @@
 #include "big_numbers.h"
 #include "pcd8544.h"
 
-#define set_is_data() digitalWrite(PCD8544_PIN_DC, 1)
-#define set_is_command() digitalWrite(PCD8544_PIN_DC, 0)
+#define pcd8544_set_is_data() digitalWrite(PCD8544_PIN_DC, 1)
+#define pcd8544_set_is_command() digitalWrite(PCD8544_PIN_DC, 0)
 
 static uint8_t current_col = 0;
 static uint8_t current_line = 0;
@@ -30,14 +30,14 @@ void pcd8544_init(void) {
     digitalWrite(PCD8544_PIN_RST, 1);
     digitalWrite(PCD8544_PIN_SSEL, 0);
 
-    set_is_command();
+    pcd8544_set_is_command();
     SPI.transfer(PCD8544_FUNCTION_SET | PCD8544_FUNCTION_H);
     SPI.transfer(PCD8544_SET_CONTRAST | PCD8544_CONTRAST);
     SPI.transfer(PCD8544_TEMP_CONTROL);
     SPI.transfer(PCD8544_BIAS | PCD8544_BIAS_BS1 | PCD8544_BIAS_BS0);
     SPI.transfer(PCD8544_FUNCTION_SET);
     SPI.transfer(PCD8544_DISPLAY_CONTROL | PCD8544_DISPLAY_CONTROL_NORMAL_MODE);
-    set_is_data();
+    pcd8544_set_is_data();
 }
 
 void pcd8544_place_cursor(uint8_t column, uint8_t line) {
@@ -49,10 +49,10 @@ void pcd8544_place_cursor(uint8_t column, uint8_t line) {
     // we write 8 pixels at a time.
     current_col = column;
     current_line = line;
-    set_is_command();
+    pcd8544_set_is_command();
     SPI.transfer(PCD8544_SET_X_ADDRESS | (current_col * 6));
     SPI.transfer(PCD8544_SET_LINE_ADDRESS | current_line);
-    set_is_data();
+    pcd8544_set_is_data();
 }
 
 static inline void write_bytes(const uint8_t * data, size_t count) {
