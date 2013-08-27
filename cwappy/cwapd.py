@@ -26,17 +26,17 @@ def str_to_ts(data_str):
 
 class NoiseMaker(threading.Thread):
     def __init__(self):
-        self.daemon = True
-        self.should_run=True
+        self.should_exit = False
         super(NoiseMaker, self).__init__()
+        self.daemon = True
 
     def run(self):
-        while self.should_run:
+        while not self.should_exit:
             for fn in os.listdir('noise'):
-                subprocess.call(('mpg123', 'noise/' + fn))
+                subprocess.call(('mpg123', os.path.join('noise', fn)))
 
     def stop(self):
-        self.should_run = False
+        self.should_exit = True
         subprocess.call(('pkill', '-2', 'mpg123'))
 
 class ArduinoListener(object):
