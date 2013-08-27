@@ -1,4 +1,4 @@
-.PHONY: all cwappy clean depends upload raw_upload reset size show_boards
+.PHONY: all cwappy clean depends upload raw_upload reset size show_boards do_upload
 
 all: build-*/tsoc.hex cwappy
 
@@ -26,6 +26,9 @@ size:
 
 show_boards:
 	@make -fMakefile_ show_boards
+
+do_upload:
+	@make -fMakefile_ do_upload
 
 
 build-*/tsoc.hex: *.ino *.c *.h build Make*
