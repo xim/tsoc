@@ -12,16 +12,13 @@
 
 // Default pin assignments. Note thet DIN and CLK are set by hardware SPI.
 #ifndef PCD8544_PIN_DC
-#define PCD8544_PIN_DC 0
+#define PCD8544_PIN_DC 49
 #endif
 #ifndef PCD8544_PIN_RST
 #define PCD8544_PIN_RST 0
 #endif
-#ifndef PCD8544_PIN_SSEL
-#define PCD8544_PIN_SSEL 0
-#endif
 #ifndef PCD8544_PIN_BL
-#define PCD8544_PIN_BL 0
+#define PCD8544_PIN_BL 48
 #endif
 
 // Default contrast value

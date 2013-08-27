@@ -19,16 +19,16 @@ static inline void inc_col(void) {
 }
 
 void pcd8544_init(void) {
+    if (PCD8544_PIN_RST != 0) {
+        pinMode(PCD8544_PIN_RST, OUTPUT);
+        digitalWrite(PCD8544_PIN_RST, 0);
+        delay(1);
+        digitalWrite(PCD8544_PIN_RST, 1);
+    }
     pinMode(PCD8544_PIN_BL, OUTPUT);
     pinMode(PCD8544_PIN_DC, OUTPUT);
-    pinMode(PCD8544_PIN_RST, OUTPUT);
-    pinMode(PCD8544_PIN_SSEL, OUTPUT);
     SPI.begin();
-
-    digitalWrite(PCD8544_PIN_RST, 0);
-    delay(1);
-    digitalWrite(PCD8544_PIN_RST, 1);
-    digitalWrite(PCD8544_PIN_SSEL, 0);
+    SPI.setBitOrder(MSBFIRST);
 
     pcd8544_set_is_command();
     SPI.transfer(PCD8544_FUNCTION_SET | PCD8544_FUNCTION_H);
