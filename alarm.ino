@@ -83,9 +83,9 @@ static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bo
         action_time->actions.flags.inverted = true;
 
     if (insert_pos == NULL)
-        push_front(action_times, action_time);
+        PUSH_FRONT(action_times, action_time);
     else
-        push_behind(insert_pos, action_time);
+        PUSH_BEHIND(insert_pos, action_time);
     if (!actionspec->actions.flags.inverted)
         prepare_action(alarm, actionspec, true);
 }
@@ -130,11 +130,11 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
             actionspec->timeout = 0x7FFF;
 
             action = new_action();
-            push_front(action->actionspecs, (void *) actionspec);
-            push_front(actions, (void *) action);
-            push_front(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
+            PUSH_FRONT(action->actionspecs, (void *) actionspec);
+            PUSH_FRONT(actions, (void *) action);
+            PUSH_FRONT(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
         }
-        push_front(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
+        PUSH_FRONT(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
     }
 
     prepare_action(alarm, new_actionspec(), false);
@@ -190,7 +190,7 @@ void alarm_run_if_appropriate(void) {
     } else
         perform_action(&action_time->actions);
 
-    pop_head(action_times);
+    POP_HEAD(action_times);
 }
 
 bool alarm_set(void) {
