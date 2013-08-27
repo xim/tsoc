@@ -19,7 +19,7 @@ import libcwap
 PICKLE_PATH = os.path.join(os.path.dirname(sys.argv[0]), 'cwap.pickle')
 
 def adjusted_time():
-    return int(time.time()) - time.timezone
+    return int(time.time()) + (3600 * time.daylight) - time.timezone
 
 def str_to_ts(data_str):
     return sum(ord(byte) << ((3 - i) * 8) for i, byte in enumerate(data_str))
