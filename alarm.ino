@@ -140,11 +140,11 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
             annoy_action->timeout = 0x7FFF;
             actionspec_t * coffee_action = new_actionspec();
             coffee_action->actions.flags.enable_relay_4 = true;
-            coffee_action->offset = -60;
+            coffee_action->offset = -90;
             coffee_action->timeout = 300;
             actionspec_t * light_action = new_actionspec();
             light_action->actions.flags.enable_relay_3 = true;
-            light_action->offset = -120;
+            light_action->offset = -180;
             light_action->timeout = 3600;
 
             action = new_action();
