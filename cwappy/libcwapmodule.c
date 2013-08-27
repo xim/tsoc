@@ -62,35 +62,39 @@ void speaking_clock_request_wrapper(timestamp_t time) {
 void noise_request_wrapper(void) {
     call_void(2);
 }
-void alarms_request_wrapper(void) {
+void noise_request_stop_wrapper(void) {
     call_void(3);
 }
+void alarms_request_wrapper(void) {
+    call_void(4);
+}
 void time_set_wrapper(timestamp_t time) {
-    call_helper(4, "(I)", time);
+    call_helper(5, "(I)", time);
 }
 void action_spec_set_wrapper(action_spec_set_t * val) {
-    call_helper(5, "(s#)", val, sizeof(action_spec_set_t));
+    call_helper(6, "(s#)", val, sizeof(action_spec_set_t));
 }
 void alarm_action_set_wrapper(alarm_action_set_t * val) {
-    call_helper(6, "(s#)", val, sizeof(alarm_action_set_t));
+    call_helper(7, "(s#)", val, sizeof(alarm_action_set_t));
 }
 void alarm_time_set_wrapper(alarm_time_set_t * val) {
-    call_helper(7, "(s#)", val, sizeof(alarm_time_set_t));
+    call_helper(8, "(s#)", val, sizeof(alarm_time_set_t));
 }
 void alarm_name_set_wrapper(alarm_name_set_t * val) {
-    call_helper(8, "(s#)", val, sizeof(alarm_name_set_t));
+    call_helper(9, "(s#)", val, sizeof(alarm_name_set_t));
 }
 void alarm_repeat_set_wrapper(alarm_repeat_set_t * val) {
-    call_helper(9, "(s#)", val, sizeof(alarm_repeat_set_t));
+    call_helper(10, "(s#)", val, sizeof(alarm_repeat_set_t));
 }
 void alarm_delete_wrapper(uint8_t alarmno) {
-    call_helper(10, "(b)", alarmno);
+    call_helper(11, "(b)", alarmno);
 }
 
 struct libcwap_functions funs = {
     .time_request_function = time_request_wrapper,
     .speaking_clock_request_function = speaking_clock_request_wrapper,
     .noise_request_function = noise_request_wrapper,
+    .noise_request_stop_function = noise_request_stop_wrapper,
     .alarms_request_function = alarms_request_wrapper,
     .time_set_function = time_set_wrapper,
     .action_spec_set = action_spec_set_wrapper,
