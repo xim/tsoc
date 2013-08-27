@@ -70,12 +70,19 @@ class ArduinoListener(object):
         self.load_data()
 
     def load_data(self):
-        with open(PICKLE_PATH) as fh:
-            self.all_data = pickle.load(fh)
+        try:
+            with open(PICKLE_PATH) as fh:
+                self.all_data = pickle.load(fh)
+        except IOError:
+            self.data = []
 
     def save_data(self):
-        with open(PICKLE_PATH + '_') as fh:
+        with open(PICKLE_PATH + '_', 'w') as fh:
             pickle.dump(self.all_data, fh)
+        try:
+            shutil.move(PICKLE_PATH, PICKLE_PATH + '.old')
+        except IOError:
+            pass
         shutil.move(PICKLE_PATH + '_', PICKLE_PATH)
 
     def collect_garbage(self):
