@@ -203,7 +203,7 @@ time_t next_alarm_time(void) {
     linked_list_t * iterator = alarms;
     while (iterator != NULL) {
         current_alarm = GET_MEMBER(iterator, alarm_t, timestamp);
-        if (current_timestamp < current_timestamp && current_alarm < lowest_time)
+        if (current_timestamp < current_alarm && current_alarm < lowest_time)
             lowest_time = current_alarm;
         NEXT(iterator);
     }
