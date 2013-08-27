@@ -18,6 +18,9 @@ import libcwap
 
 PICKLE_PATH = os.path.join(os.path.dirname(sys.argv[0]), 'cwap.pickle')
 
+def adjusted_time():
+    return int(time.time()) - time.timezone
+
 def str_to_ts(data_str):
     return sum(ord(byte) << ((3 - i) * 8) for i, byte in enumerate(data_str))
 
@@ -79,7 +82,7 @@ class ArduinoListener(object):
         old_size = len(self.all_data)
         for data_str in self.all_data:
             if data_str[0] == 'O':
-                if str_to_ts(data_str[2:]) < int(time.time()):
+                if str_to_ts(data_str[2:]) < adjusted_time():
                     self.debug('%d was too old, dropping' % ord(data_str[1]))
                     self.all_data.remove(data_str)
         if len(self.all_data) != old_size:
@@ -100,7 +103,7 @@ class ArduinoListener(object):
         self.info('Sending timestamp over serial')
         try:
             self.arduino.write('T')
-            ts = int(time.time())
+            ts = adjusted_time()
             for offset in xrange(0, 32, 8):
                 self.arduino.write(ts >> offset & 0xff)
         except serial.writeTimeoutError:
