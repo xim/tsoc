@@ -112,7 +112,7 @@ class ArduinoListener(object):
             self.arduino.write('T')
             ts = adjusted_time()
             for offset in xrange(0, 32, 8):
-                self.arduino.write(ts >> offset & 0xff)
+                self.arduino.write(chr(ts >> offset & 0xff))
         except serial.writeTimeoutError:
             pass
 
