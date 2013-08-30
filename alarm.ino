@@ -30,10 +30,10 @@ static linked_list_t * alarms = NULL;
 static linked_list_t * running_alarms = NULL;
 static linked_list_t * action_times = NULL;
 
-static inline alarm_t * new_alarm(uint8_t alarmno, time_t timestamp) {
+static inline alarm_t * new_alarm(uint8_t alarmno) {
     alarm_t * empty = MALLOC_TYPE(alarm_t);
     empty->alarmno = alarmno;
-    empty->timestamp = timestamp;
+    empty->timestamp = LARGEST_TIMESTAMP;
     empty->name = NULL;
     empty->repetition.mask = 0;
     empty->actionnos = NULL;
@@ -131,7 +131,7 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
 
     // If alarm doesn't exist, create a default action set.
     if (alarm == NULL) {
-        alarm = new_alarm(alarm_req->alarmno, alarm_req->timestamp);
+        alarm = new_alarm(alarm_req->alarmno);
         alarm->name = strdup("Default");
         PUSH_FRONT(alarms, (void *) alarm);
 
@@ -159,6 +159,7 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
         }
         PUSH_FRONT(alarm->actionnos, COPY_ITEM(uint8_t, &action->actionno));
     }
+    alarm->timestamp = alarm_req->timestamp;
 
     // Magical action that tells us the main part of the alarm is running.
     prepare_action(alarm->alarmno, alarm->timestamp, new_actionspec(), false);
