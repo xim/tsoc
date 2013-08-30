@@ -220,12 +220,6 @@ void alarm_run_if_appropriate(void) {
         keypad_set_action(alarm_running_action);
         alarm_t * alarm = get_alarm(action_time->alarmno);
         PUSH_FRONT(running_alarms, COPY_ITEM(uint8_t, &action_time->alarmno));
-        if (alarm != NULL && alarm->repetition.mask) { // Not having an alarm here should be impossible?
-            alarm_time_set_t next_run;
-            next_run.alarmno = alarm->alarmno;
-            next_run.timestamp = next_repeat(alarm->timestamp, alarm->repetition);
-            alarm_set_timestamp(&next_run);
-        }
         menu_title("Alarm ringing!");
         if (alarm != NULL && alarm->name != NULL) {
             char content[16];
@@ -282,6 +276,14 @@ void alarm_stop(void) {
         NEXT(iterator);
         free(to_delete->item);
         free(to_delete);
+
+        alarm_t * alarm = get_alarm(alarmno);
+        if (alarm != NULL && alarm->repetition.mask) {
+            alarm_time_set_t next_run;
+            next_run.alarmno = alarm->alarmno;
+            next_run.timestamp = next_repeat(alarm->timestamp, alarm->repetition);
+            alarm_set_timestamp(&next_run);
+        }
     }
     running_alarms = NULL;
 }
