@@ -9,5 +9,7 @@ void alarm_set_default_timestamp(time_t);
 void alarm_run_if_appropriate(void);
 time_t next_alarm_time(void);
 bool alarm_set(void);
+void alarm_snooze(uint8_t);
+void alarm_stop(void);
 
 #endif

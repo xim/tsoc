@@ -1,5 +1,6 @@
 #include "action.h"
 #include "alarm.h"
+#include "keypad.h"
 #include "libcwap.h"
 #include "linked_list.h"
 #include "menu.h"
@@ -26,6 +27,7 @@ typedef struct {
 
 static linked_list_t * actions = NULL;
 static linked_list_t * alarms = NULL;
+static linked_list_t * running_alarms = NULL;
 static linked_list_t * action_times = NULL;
 
 static inline alarm_t * new_alarm(uint8_t alarmno, time_t timestamp) {
@@ -190,6 +192,22 @@ static inline time_t next_repeat(time_t time, weekdays_t repetition) {
     // TODO Here, we should find the next geek day! For now, treat geek_day as every_day!
 }
 
+static void alarm_running_action(char button) {
+    last_menu_action_time = current_timestamp;
+    menu_clear();
+    if ('1' <= button && button <= '9') {
+        char content[29];
+        uint8_t snooze = button - '0';
+        sprintf(content, "Alarm snoozed %d minute%c", snooze, snooze == 1 ? ' ' : 's');
+        menu_content(content);
+        alarm_snooze(snooze);
+    } else {
+        keypad_set_action(menu_main_screen_action);
+        menu_content("Alarm disabled");
+        alarm_stop();
+    }
+}
+
 void alarm_run_if_appropriate(void) {
     if (action_times == NULL)
         return;
@@ -198,16 +216,15 @@ void alarm_run_if_appropriate(void) {
         return;
 
     if (!action_time->actions.mask) { // Is main alarm object
+        keypad_set_action(alarm_running_action);
         alarm_t * alarm = get_alarm(action_time->alarmno);
+        PUSH_FRONT(running_alarms, COPY_ITEM(uint8_t, &action_time->alarmno));
         if (alarm != NULL && alarm->repetition.mask) { // Not having an alarm here should be impossible?
             alarm_time_set_t next_run;
             next_run.alarmno = alarm->alarmno;
             next_run.timestamp = next_repeat(alarm->timestamp, alarm->repetition);
             alarm_set_timestamp(&next_run);
         }
-        // TODO Remember to keep meta of where we are – are any actions
-        // running, are we snoozed, etc. ... and also make the menu reflect the
-        // state, showing alarm name etc.
         menu_title("Alarm ringing!");
         if (alarm != NULL && alarm->name != NULL) {
             char content[16];
@@ -236,4 +253,61 @@ time_t next_alarm_time(void) {
         NEXT(iterator);
     }
     return lowest_time;
+}
+
+void alarm_stop(void) {
+    linked_list_t * iterator = running_alarms;
+    while (iterator != NULL) {
+        uint8_t alarmno = *GET_ITEM(iterator, uint8_t);
+        linked_list_t * actiontime_iterator = action_times;
+        linked_list_t * prev_iter = NULL;
+        while (actiontime_iterator != NULL) {
+            action_time_t * action_time = GET_ITEM(actiontime_iterator, action_time_t);
+            if (action_time->alarmno == alarmno && action_time->actions.flags.inverted && action_time->actions.flags.snoozable) {
+                linked_list_t * to_delete = actiontime_iterator;
+                perform_action(&action_time->actions);
+                if (prev_iter == NULL)
+                    actiontime_iterator = action_times = actiontime_iterator->next;
+                else
+                    actiontime_iterator = prev_iter->next = actiontime_iterator->next;
+                free(action_time);
+                free(to_delete);
+            } else {
+                prev_iter = actiontime_iterator;
+                NEXT(actiontime_iterator);
+            }
+        }
+        linked_list_t * to_delete = iterator;
+        NEXT(iterator);
+        free(to_delete->item);
+        free(to_delete);
+    }
+    running_alarms = NULL;
+}
+
+void alarm_snooze(uint8_t minutes) {
+    linked_list_t * iterator = running_alarms;
+    while (iterator != NULL) {
+        uint8_t alarmno = *GET_ITEM(iterator, uint8_t);
+        linked_list_t * actiontime_iterator = action_times;
+        linked_list_t * prev_iter = NULL;
+        while (actiontime_iterator != NULL) {
+            action_time_t * action_time = GET_ITEM(actiontime_iterator, action_time_t);
+            if (action_time->alarmno == alarmno && action_time->actions.flags.inverted && action_time->actions.flags.snoozable) {
+                linked_list_t * to_delete = actiontime_iterator;
+                perform_action(&action_time->actions);
+                actionspec_t redo_spec = {action_time->actions, (uint16_t)(action_time->timestamp - current_timestamp) + (uint16_t)minutes * 60, 0};
+                prepare_action(alarmno, current_timestamp + minutes * 60, &redo_spec, false);
+                if (prev_iter == NULL)
+                    actiontime_iterator = action_times = actiontime_iterator->next;
+                else
+                    actiontime_iterator = prev_iter->next = actiontime_iterator->next;
+                free(action_time);
+                free(to_delete);
+            }
+            prev_iter = actiontime_iterator;
+            NEXT(actiontime_iterator);
+        }
+        NEXT(iterator);
+    }
 }

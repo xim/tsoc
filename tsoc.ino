@@ -50,7 +50,7 @@ void setup(void) {
     set_time_requester(request_time);
     keypad_init();
     wait_for_time_sync();
-    keypad_set_action(menu_action);
+    keypad_set_action(menu_main_screen_action);
     menu_clear();
 }
 

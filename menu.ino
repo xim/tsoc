@@ -82,7 +82,7 @@ static inline void persist_clock_as_alarm(void) {
     alarm_set_default_timestamp(current_timestamp + alarm - elapsed_now);
 }
 
-void menu_action(char button) {
+void menu_main_screen_action(char button) {
     last_menu_action_time = current_timestamp;
     if ('0' <= button && button <= '9') {
         input_buffer[current_i++ % 4] = button;
@@ -90,6 +90,7 @@ void menu_action(char button) {
         pcd8544_draw_big_clock(clock);
     } else {
         // TODO make an actual menu?
+        // We can switch over key and set action handlers.
         char data[14];
         sprintf(data, "%c =)", button);
         menu_title(data);
@@ -120,8 +121,8 @@ void menu_check_state(void) {
         sprintf(clock, "%02lu:%02lu", get_hour(current_timestamp), get_minute(current_timestamp));
 
     if (last_menu_action_time > (current_timestamp - 15)) {
-        menu_redraw_clock(current_timestamp);
         pcd8544_set_backlight_state(true);
+        menu_redraw_clock(current_timestamp);
 
         if (current_i) {
             pcd8544_draw_big_clock(clock);
@@ -129,13 +130,15 @@ void menu_check_state(void) {
                 char content[22];
                 sprintf(content, "Alarm set to\n"
                                  "%s\n\n", clock);
+                menu_clear();
                 menu_content(content);
                 persist_clock_as_alarm();
             }
         }
     } else {
-        if (alarm_set())
-            menu_redraw_clock(next_alarm_time());
+        const time_t next_alarm = next_alarm_time();
+        if (alarm_set() && next_alarm != LARGEST_TIMESTAMP)
+            menu_redraw_clock(next_alarm);
         else
             menu_clear_clock();
         pcd8544_draw_big_clock(clock);
