@@ -16,6 +16,10 @@ void menu_init(void) {
     menu_title("<3");
 }
 
+static inline time_t time_since_action(void) {
+    return current_timestamp - last_menu_action_time;
+}
+
 static inline void menu_redraw_clock(const time_t time) {
     char small_clock[6];
     sprintf(small_clock, "%02lu:%02lu", get_hour(time), get_minute(time));
@@ -120,13 +124,13 @@ void menu_check_state(void) {
     if (!current_i)
         sprintf(clock, "%02lu:%02lu", get_hour(current_timestamp), get_minute(current_timestamp));
 
-    if (last_menu_action_time > (current_timestamp - 15)) {
+    if (time_since_action() <= 15) {
         pcd8544_set_backlight_state(true);
         menu_redraw_clock(current_timestamp);
 
         if (current_i) {
             pcd8544_draw_big_clock(clock);
-            if (last_menu_action_time < (current_timestamp - 10)) {
+            if (time_since_action() > 10) {
                 char content[22];
                 sprintf(content, "Alarm set to\n"
                                  "%s\n\n", clock);
