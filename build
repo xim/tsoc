@@ -1,5 +1,20 @@
 #!/bin/bash
 
+cleanup() {
+	rm temp.ino
+
+	for file in *.ino_ *.c_ ; do
+		mv "$file" "${file%%_}"
+	done
+}
+
+interrupt() {
+	cleanup
+	exit 2
+}
+
+trap interrupt INT
+
 [[ -f temp.ino ]] && rm temp.ino
 
 for file in *.ino *.c ; do
@@ -11,10 +26,6 @@ done
 make -fMakefile_ "$@"
 retval=$?
 
-rm temp.ino
-
-for file in *.ino_ *.c_ ; do
-	mv "$file" "${file%%_}"
-done
+cleanup
 
 exit $retval
