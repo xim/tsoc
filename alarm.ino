@@ -105,11 +105,13 @@ static inline void clear_actions(uint8_t alarmno) {
     linked_list_t * iterator = action_times;
     while (iterator != NULL) {
         if (GET_MEMBER(action_times, action_time_t, alarmno) == alarmno) {
+            linked_list_t * to_delete = iterator;
             if (prev_iter == NULL)
-                action_times = iterator->next;
+                iterator = action_times = iterator->next;
             else
-                prev_iter->next = iterator->next;
-            free(iterator);
+                iterator = prev_iter->next = iterator->next;
+            free(to_delete->item);
+            free(to_delete);
         }
         prev_iter = iterator;
         NEXT(iterator);
