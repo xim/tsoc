@@ -32,7 +32,8 @@ void call_void(Py_ssize_t index) {
     if (fun == Py_None)
         return;
     result = PyObject_CallObject(fun, NULL);
-    Py_DECREF(result);
+    if (result != NULL)
+        Py_DECREF(result);
 }
 
 void call_helper(Py_ssize_t index, const char * format, ...) {
@@ -50,7 +51,8 @@ void call_helper(Py_ssize_t index, const char * format, ...) {
     Py_DECREF(arglist);
     if(result == NULL)
         PyErr_SetString(PyExc_RuntimeError, "Failed to call registered callback");
-    Py_DECREF(result);
+    else
+        Py_DECREF(result);
 }
 
 void time_request_wrapper(void) {
