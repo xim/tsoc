@@ -73,8 +73,8 @@ static inline action_t * get_action(uint8_t actionno) {
     return NULL;
 }
 
-static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bool invert) {
-    time_t action_timestamp = alarm->timestamp + actionspec->offset;
+static inline void prepare_action(uint8_t alarmno, time_t time, actionspec_t * actionspec, bool invert) {
+    time_t action_timestamp = time + actionspec->offset;
 
     if (invert)
         action_timestamp += actionspec->timeout;
@@ -86,7 +86,7 @@ static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bo
         NEXT(iterator);
     }
     action_time_t * action_time = MALLOC_TYPE(action_time_t);
-    action_time->alarmno = alarm->alarmno;
+    action_time->alarmno = alarmno;
     action_time->timestamp = action_timestamp;
     action_time->actions = actionspec->actions;
     action_time->actions.flags.inverted = invert;
@@ -97,7 +97,7 @@ static inline void prepare_action(alarm_t * alarm, actionspec_t * actionspec, bo
         PUSH_BEHIND(insert_pos, action_time);
 
     if (!invert)
-        prepare_action(alarm, actionspec, true);
+        prepare_action(alarmno, time, actionspec, true);
 }
 
 static inline void clear_actions(uint8_t alarmno) {
@@ -169,7 +169,7 @@ void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
             if (actionno == GET_MEMBER(action_iterator, action_t, actionno)) {
                 linked_list_t * actionspec_iterator = GET_MEMBER(action_iterator, action_t, actionspecs);
                 while (actionspec_iterator != NULL) {
-                    prepare_action(alarm, GET_ITEM(actionspec_iterator, actionspec_t), false);
+                    prepare_action(alarm->alarmno, alarm->timestamp, GET_ITEM(actionspec_iterator, actionspec_t), false);
                     NEXT(actionspec_iterator);
                 }
             }
