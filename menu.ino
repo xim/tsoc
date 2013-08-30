@@ -135,9 +135,8 @@ void menu_check_state(void) {
             }
         }
     } else {
-        const time_t next_alarm = next_alarm_time();
-        if (alarm_set() && next_alarm != LARGEST_TIMESTAMP)
-            menu_redraw_clock(next_alarm);
+        if (alarm_state != alarm_none)
+            menu_redraw_clock(next_alarm_time());
         else
             menu_clear_clock();
         pcd8544_draw_big_clock(clock);

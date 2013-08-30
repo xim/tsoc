@@ -125,6 +125,7 @@ void alarm_set_default_timestamp(time_t timestamp) {
     alarm_set_timestamp(&req);
 }
 void alarm_set_timestamp(alarm_time_set_t * alarm_req) {
+    alarm_state = alarm_set;
     clear_actions(alarm_req->alarmno);
 
     alarm_t * alarm = get_alarm(alarm_req->alarmno);
@@ -209,36 +210,45 @@ static void alarm_running_action(char button) {
     }
 }
 
+static inline void main_action(action_time_t * action_time) {
+    alarm_state = alarm_ringing;
+    keypad_set_action(alarm_running_action);
+    alarm_t * alarm = get_alarm(action_time->alarmno);
+    PUSH_FRONT(running_alarms, COPY_ITEM(uint8_t, &action_time->alarmno));
+    menu_title("Alarm ringing!");
+    if (alarm != NULL && alarm->name != NULL) {
+        char content[16];
+        sprintf(content, "\n\n\n%s", alarm->name);
+        menu_content(content);
+    } else
+        menu_content("\n\n\nUnnamed");
+}
+
 void alarm_run_if_appropriate(void) {
-    if (action_times == NULL)
+    if (alarm_state == alarm_none)
         return;
     action_time_t * action_time = GET_ITEM(action_times, action_time_t);
     if (action_time->timestamp > current_timestamp)
         return;
 
-    if (!action_time->actions.mask) { // Is main alarm object
-        keypad_set_action(alarm_running_action);
-        alarm_t * alarm = get_alarm(action_time->alarmno);
-        PUSH_FRONT(running_alarms, COPY_ITEM(uint8_t, &action_time->alarmno));
-        menu_title("Alarm ringing!");
-        if (alarm != NULL && alarm->name != NULL) {
-            char content[16];
-            sprintf(content, "\n\n\n%s", alarm->name);
-            menu_content(content);
-        } else
-            menu_content("\n\n\nUnnamed");
-    } else
+    if (!action_time->actions.mask) // Is main alarm object
+        main_action(action_time);
+    else
         perform_action(&action_time->actions);
 
     POP_HEAD(action_times);
 }
 
-bool alarm_set(void) {
-    return action_times != NULL;
-}
-
 time_t next_alarm_time(void) {
     time_t lowest_time = LARGEST_TIMESTAMP;
+    if (alarm_state == alarm_none)
+        return lowest_time;
+    if (alarm_state == alarm_snoozed || alarm_state == alarm_ringing) {
+        if (action_times == NULL)
+            return current_timestamp;
+        else
+            return GET_MEMBER(action_times, action_time_t, timestamp);
+    }
     time_t current_alarm;
     linked_list_t * iterator = alarms;
     while (iterator != NULL) {
@@ -286,9 +296,14 @@ void alarm_stop(void) {
         }
     }
     running_alarms = NULL;
+    if (action_times == NULL)
+        alarm_state = alarm_none;
+    else
+        alarm_state = alarm_set;
 }
 
 void alarm_snooze(uint8_t minutes) {
+    alarm_state = alarm_snoozed;
     linked_list_t * iterator = running_alarms;
     while (iterator != NULL) {
         uint8_t alarmno = *GET_ITEM(iterator, uint8_t);
