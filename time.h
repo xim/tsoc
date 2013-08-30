@@ -8,9 +8,9 @@ typedef uint32_t time_t;
 #define LARGEST_TIMESTAMP (0xFFFFFFFF)
 
 // Globally available
-static time_t current_timestamp = 345600UL; // first monday *ever*
-static bool time_has_been_set = false;
-static time_t measured_time_drift = 0;
+time_t current_timestamp = 345600UL; // first monday *ever*
+bool time_has_been_set = false;
+int measured_time_drift = 0;
 
 enum week_day {
     Monday = 0, Tuesday = 1, Wednesday = 2, Thursday = 3, Friday = 4, Saturday = 5, Sunday = 6
@@ -51,7 +51,6 @@ typedef void (*request_time_function_t)(void);
 #define last_midnight(time) (time - elapsed_seconds_today(time))
 #define next_midnight(time) (last_midnight(time) + SECS_PER_DAY)
 
-time_t get_time(void);
 void update_time(void);
 void set_time(time_t t);
 
