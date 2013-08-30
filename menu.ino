@@ -130,7 +130,6 @@ void menu_check_state(void) {
                 char content[22];
                 sprintf(content, "Alarm set to\n"
                                  "%s\n\n", clock);
-                menu_clear();
                 menu_content(content);
                 persist_clock_as_alarm();
             }
