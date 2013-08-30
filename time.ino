@@ -27,6 +27,7 @@ void update_time(void) {
 
 void set_time(time_t t) {
     next_sync_threshold = t + sync_interval;
+    update_time();
     if (time_has_been_set) {
         measured_time_drift += current_timestamp - t;
     } else {
@@ -38,6 +39,7 @@ void set_time(time_t t) {
 
 void set_time_requester(request_time_function_t requester) {
     time_requester = requester;
+    next_sync_threshold = current_timestamp + sync_interval;
     (*requester)();
 }
 
